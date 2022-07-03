@@ -1,0 +1,64 @@
+{
+    "env": {
+      "node": true,
+      "es6": true,
+      "mocha": true
+    },
+    "globals": {
+      "document": false,
+      "navigator": false,
+      "window": false
+    },
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 2021
+    },
+    "rules": {
+      "block-spacing": [2, "always"],
+      "brace-style": [2, "1tbs", {
+        "allowSingleLine": false
+      }],
+      "operator-linebreak": [2, "after"],
+      "no-multiple-empty-lines": [2, {
+        "max": 1
+      }],
+      "semi": [2, "always"],
+      "comma-dangle": [2, "never"],
+      "no-trailing-spaces": [2, {
+        "skipBlankLines": true
+      }],
+      "camelcase": [
+        2,
+        {
+          "properties": "never"
+        }
+      ],
+      "eqeqeq": 2,
+      "indent": [
+        2,
+        4,
+        {
+          "SwitchCase": 1
+        }
+      ],
+      "no-use-before-define": 2,
+      "max-len": [
+        2,
+        120
+      ],
+      "new-cap": 2,
+      "quotes": [
+        2,
+        "single"
+      ],
+      "prefer-const": "error",
+      "no-undef": 2,
+      "no-unused-vars": 2,
+      "no-eq-null": 2,
+      "space-before-function-paren": [
+        2,
+        "never"
+      ]
+    }
+  }
+  
