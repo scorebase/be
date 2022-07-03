@@ -9,7 +9,7 @@
 * Run
 
 ```bash
-	npx husky-init && npm install
+	npm install
 ```
 
 * Set up your .env file with the .env.example template
