@@ -7,10 +7,10 @@
     "dev": "nodemon index",
     "start": "node index",
     "test:unit": "NODE_ENV=test nyc _mocha test/unit/* --exit",
-    "test:all": "NODE_ENV=test npm run test:unit && NODE_ENV=test npm run test:integration",
+    "test:integration": "NODE_ENV=test nyc _mocha test/integration/* --exit",
+    "test:all": "npm run test:unit && npm run test:integration",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "test:integration": "NODE_ENV=test nyc _mocha test/integration/* --exit"
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
