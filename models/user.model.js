@@ -4,8 +4,7 @@ const sequelize = require('../config/db');
 class User extends Model {}
 
 User.init({
-    // Model attributes are defined here
-    fullName: {
+    full_name: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -24,5 +23,8 @@ User.init({
 
 }, {
     sequelize,
-    modelName: 'User'
+    modelName: 'User',
+    tableName: 'users'
 });
+
+module.exports = User;

@@ -20,7 +20,8 @@ Team.init({
     }
 }, {
     sequelize,
-    modelName: 'Team'
+    modelName: 'Team',
+    tableName: 'teams'
 });
 
 module.exports = Team;
