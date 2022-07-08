@@ -1,9 +1,9 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
 
-class LeagueMembers extends Model {};
+class LeagueMember extends Model {};
 
-LeagueMembers.init({
+LeagueMember.init({
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
