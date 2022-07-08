@@ -9,11 +9,11 @@ PickItem.init(
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        home_pick_id: {
+        home_pick: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        away_pick_id: {
+        away_pick: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
