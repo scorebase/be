@@ -1,5 +1,7 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const GameWeek = require('./gameweek.model');
+const User = require('./user.model');
 
 class Picks extends Model {}
 
@@ -15,7 +17,8 @@ Picks.init(
         },
         total_points: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            defaultValue: 0
         }
     },
     {
@@ -24,5 +27,13 @@ Picks.init(
         tableName: 'picks'
     }
 );
+
+Picks.belongsTo(User, {
+    foreignKey : 'player_id'
+});
+
+Picks.belongsTo(GameWeek, {
+    foreignKey : 'gameweek_id'
+});
 
 module.exports = Picks;

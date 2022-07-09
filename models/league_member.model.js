@@ -1,5 +1,7 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const League = require('./league.model');
+const User = require('./user.model');
 
 class LeagueMember extends Model {};
 
@@ -14,5 +16,17 @@ LeagueMember.init({
     }
 }, {
     sequelize,
-    modelName: 'LeagueMember'
+    modelName: 'LeagueMember',
+    tableName: 'league_members'
 });
+
+LeagueMember.belongsTo(League, {
+    foreignKey : 'league_id'
+});
+
+LeagueMember.belongsTo(User, {
+    foreignKey : 'player_id',
+    as: 'player'
+});
+
+module.exports = LeagueMember;

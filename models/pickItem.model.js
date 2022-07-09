@@ -1,5 +1,7 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const Fixture = require('./fixture.model');
+const Picks = require('./picks.model');
 
 class PickItem extends Model {}
 
@@ -19,7 +21,8 @@ PickItem.init(
         },
         points: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            defaultValue : 0
         },
         picks_id: {
             type: DataTypes.INTEGER,
@@ -27,14 +30,24 @@ PickItem.init(
         },
         is_master_pick: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            allowNull: false,
+            defaultValue: false
         }
     },
     {
         sequelize,
         modelName: 'PickItem',
-        tableName: 'pickitem'
+        tableName: 'pick_items'
     }
 );
+
+PickItem.belongsTo(Picks, {
+    foreignKey : 'picks_id'
+});
+
+PickItem.belongsTo(Fixture, {
+    foreignKey : 'fixture_id',
+    as : 'fixture'
+});
 
 module.exports = PickItem;

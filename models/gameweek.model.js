@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const Season = require('./season.model');
 
 class GameWeek extends Model {}
 
@@ -21,8 +22,12 @@ GameWeek.init(
     {
         sequelize,
         modelName: 'GameWeek',
-        tableName: 'gameweek'
+        tableName: 'gameweeks'
     }
 );
+
+GameWeek.belongsTo(Season, {
+    foreignKey: 'season_id'
+});
 
 module.exports = GameWeek;

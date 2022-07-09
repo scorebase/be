@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const GameWeek = require('./gameweek.model');
 const Team = require('./team.model');
 
 class Fixture extends Model {}
@@ -49,6 +50,11 @@ Fixture.belongsTo(Team, {
 Fixture.belongsTo(Team, {
     foreignKey : 'home_team_id',
     as: 'home_team'
+});
+
+Fixture.belongsTo(GameWeek, {
+    foreignKey : 'gameweek_id',
+    as : 'gameweek'
 });
 
 module.exports = Fixture;

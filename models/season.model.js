@@ -13,6 +13,9 @@ Season.init(
     {
         sequelize,
         modelName: 'Season',
-        tableName: 'season'
+        tableName: 'seasons',
+        timestamps : false
     }
 );
+
+module.exports = Season;
