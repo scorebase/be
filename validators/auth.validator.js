@@ -1,0 +1,25 @@
+const joi = require('joi');
+
+const authValidator = {
+    registerUserSchema : joi.object({
+        fullName : joi.string().min(5).required(),
+        username: joi.string().alphanum().min(3).max(30).required(),
+        email : joi.string().email().required(),
+        password : joi.string().min(7).required()
+    }),
+
+    loginUserSchema : joi.object({
+        password : joi.string().min(7).required(),
+        user : joi.alternatives([
+            joi.string().alphanum().min(3),
+            joi.string().email()
+        ]).label('username or email').required()
+    }),
+
+    updatePasswordSchema : joi.object({
+        oldPassword : joi.string().min(7).required(),
+        newPassword : joi.string().disallow(joi.ref('oldPassword')).min(7).required()
+    })
+};
+
+module.exports = authValidator;

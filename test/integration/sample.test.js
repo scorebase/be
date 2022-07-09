@@ -5,7 +5,7 @@ const server = require('../..');
 
 chai.use(chaiHttp);
 
-describe("/ test", () => {
+describe("/", () => {
     it('should return valid data for base path', () => {
         chai.request(server)
         .get('/')

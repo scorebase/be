@@ -27,12 +27,6 @@
       "no-trailing-spaces": [2, {
         "skipBlankLines": true
       }],
-      "camelcase": [
-        2,
-        {
-          "properties": "never"
-        }
-      ],
       "eqeqeq": 2,
       "indent": [
         2,
@@ -46,7 +40,6 @@
         2,
         120
       ],
-      "new-cap": 2,
       "quotes": [
         2,
         "single"

@@ -1,0 +1,1 @@
+module.exports.TOKEN_HEADER = 'x-user-token';
