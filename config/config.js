@@ -28,4 +28,7 @@ const config = {
     }
 };
 
+//if test mode, update PORT so that PORT does not clash with the one already running on development.
+if(config.mode === 'test') config.port = process.env.PORT_TEST;
+
 module.exports = config;
