@@ -63,7 +63,7 @@ describe('POST /auth/register', () => {
         .catch(done)
     })
 
-    it('should return email exists error if username already exists', (done) => {
+    it('should return username exists error if username already exists', (done) => {
         let user = { ...users[2], username : users[0].username };
         chai.request(server)
         .post('/auth/register')
