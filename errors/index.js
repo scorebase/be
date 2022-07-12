@@ -9,6 +9,10 @@ module.exports = {
         INVALID_SESSION : 'Invalid session.'
     },
     userErrors : {
-        USER_NOT_FOUND : 'User not found'
+        USER_NOT_FOUND : 'User not found.'
+    },
+    leagueErrors : {
+        LEAGUE_NOT_FOUND : 'League not found.',
+        LEAGUE_PERMISSION_ERROR : 'Only the league admin can perform this action.'
     }
 };

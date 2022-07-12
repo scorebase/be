@@ -13,6 +13,33 @@ const LeagueController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    async updateLeague(req, res, next) {
+        try {
+            const { name, max_participants, is_closed } = req.body;
+
+            const leagueChanges = {};
+            if(name) leagueChanges.name = name;
+            if(max_participants) leagueChanges.max_participants = max_participants;
+            if(is_closed) leagueChanges.is_closed = is_closed;
+
+            const data = await LeagueService.updateLeague(req.userId , req.params.leagueId, leagueChanges);
+
+            return successResponse(res, leagueMessages.LEAGUE_UPDATE_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async regenerateLeagueCode(req, res, next) {
+        try {
+            const data = await LeagueService.regenerateCode(req.userId, req.params.leagueId);
+
+            return successResponse(res, leagueMessages.NEW_CODE_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
     }
 };
 
