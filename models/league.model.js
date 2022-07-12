@@ -32,6 +32,11 @@ League.init(
         starting_gameweek: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        is_closed : {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            comment : 'League is closed to new entries.'
         }
     },
     {
