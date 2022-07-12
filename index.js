@@ -7,6 +7,7 @@ const sequelize = require('./config/db');
 ///routes
 const authRouter = require('./routes/auth.route');
 const userRouter = require('./routes/user.route');
+const leagueRouter = require('./routes/league.route');
 
 const server = express();
 
@@ -24,6 +25,7 @@ server.get('/', (req, res) => {
 
 server.use('/auth', authRouter);
 server.use('/user', userRouter);
+server.use('/league', leagueRouter);
 
 //Handle all errors
 /* eslint-disable */ 
