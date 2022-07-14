@@ -10,5 +10,9 @@ module.exports = {
     },
     userErrors : {
         USER_NOT_FOUND : 'User not found'
+    },
+    seasonErrors: {
+        SEASON_NAME_EXISTS: 'There is a season with similar name. Please choose another one.',
+        SEASON_NOT_FOUND: 'Season not found'
     }
 };
