@@ -1,5 +1,5 @@
 const joi = require('joi');
-const { LEAGUE_TYPES } = require('../helpers/constants');
+const { LEAGUE_TYPES, LEAGUE_CODE_LENGTH } = require('../helpers/constants');
 
 const leagueValidator = {
     createLeagueSchema : joi.object({
@@ -12,6 +12,9 @@ const leagueValidator = {
         name : joi.string().min(3).max(30),
         max_participants : joi.number().integer().min(2),
         is_closed : joi.boolean()
+    }),
+    joinLeagueSchema : joi.object({
+        invite_code : joi.string().alphanum().length(LEAGUE_CODE_LENGTH).required()
     })
 };
 

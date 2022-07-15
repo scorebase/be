@@ -9,6 +9,8 @@ const server = require('../..');
 const { leagueErrors } = require('../../errors');
 const { leagueMessages } = require('../../helpers/messages');
 const LeagueService = require('../../services/league.service');
+const League = require('../../models/league.model');
+const LeagueMember = require('../../models/league_member.model');
 
 chai.use(chaiHttp);
 
@@ -82,6 +84,32 @@ describe('PUT /league/:leagueId', () => {
         .catch(done)
     })
 
+    it('should open league to new entries successfully', (done) => {
+        let newUpdates = { ...leagueUpdates, is_closed : false };
+        chai.request(server)
+        .put('/league/1')
+        .send(newUpdates)
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(200);
+            const schema = joi.object({
+                id: joi.number().integer().required(),
+                name: joi.string().valid(leagueUpdates.name).required(),
+                invite_code: joi.string().alphanum().required(),
+                max_participants: joi.number().integer().valid(leagueUpdates.max_participants).required(),
+                type: joi.number().integer().valid(LEAGUE_TYPES.general, LEAGUE_TYPES.public, LEAGUE_TYPES.private),
+                starting_gameweek: joi.number().integer().valid(1).required(),
+                administrator_id : joi.number().valid(1).required(),
+                updatedAt: joi.date().required(),
+                createdAt: joi.date().required(),
+                is_closed : joi.boolean().valid(newUpdates.is_closed).required()
+            })
+            joi.assert(res.body.data, schema);
+            done()
+        })
+        .catch(done)
+    })
+
     it('should return forbidden error if a non-admin tries to update a league', (done) => {
         chai.request(server)
         .put('/league/1')
@@ -114,12 +142,11 @@ describe('PUT /league/:leagueId', () => {
     })
 })
 
-
 describe('PUT /league/:leagueId/code', () => {
     
     let token = AuthService.generateToken({ id : 1 });
-    it('should successfully update a league code.', async () => {
-        return new Promise(async function (resolve) {
+    it('should successfully update a league code.', () => {
+        return new Promise(async function (resolve, reject) {
             const { invite_code : oldCode } = await LeagueService.loadLeague(1);
             chai.request(server)
             .put('/league/1/code')
@@ -136,6 +163,178 @@ describe('PUT /league/:leagueId/code', () => {
                 joi.assert(res.body, schema);
                 resolve()
             })
+            .catch(reject)
         })
+    })
+})
+
+describe('PUT /league/join', () => {
+    let token = AuthService.generateToken({ id : 1 });
+    let tokenUserTwo = AuthService.generateToken({ id : 2 });
+    let tokenUserThree = AuthService.generateToken({ id : 3 });
+    it('join league successfully.', () => {
+        return new Promise(async function (resolve, reject) {
+            const { invite_code } = await League.findByPk(1);
+            chai.request(server)
+            .post('/league/join')
+            .send({ invite_code })
+            .set(TOKEN_HEADER, tokenUserTwo)
+            .then(res => {
+                expect(res).to.have.status(200);
+                expect(res.body.message).to.equal(leagueMessages.LEAGUE_JOIN_SUCCESS)
+            })
+            .then(async () => {
+                const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 1}});
+                if(!userInLeague) {
+                    reject(new Error("User not present in league."))
+                } 
+                resolve();
+            })
+            .catch(reject)
+        })
+    })
+    it('should fail if user is already in the league.', () => {
+        return new Promise(async function (resolve, reject) {
+            const { invite_code } = await League.findByPk(1);
+            chai.request(server)
+            .post('/league/join')
+            .send({ invite_code })
+            .set(TOKEN_HEADER, tokenUserTwo)
+            .then(res => {
+                expect(res).to.have.status(400);
+                expect(res.body.message).to.equal(leagueErrors.LEAGUE_ALREADY_JOINED)
+                resolve();
+            })
+            .catch(reject)
+        })
+    })
+
+    it('should fail if invite_code is not found.', (done) => {
+        chai.request(server)
+        .post('/league/join')
+        .send({invite_code : 'abcdefg'})
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal(leagueErrors.INVALID_LEAGUE_CODE)
+            done()
+        })
+        .catch(done)
+    })
+
+    it('should fail if invite_code is not provided.', (done) => {
+        chai.request(server)
+        .post('/league/join')
+        .send({})
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(422);
+            done()
+        })
+        .catch(done)
+    })
+
+    it('should fail if league is closed to new entries', () => {
+        return new Promise(async function (resolve, reject) {
+            const league = await LeagueService.loadLeague(1);
+            league.is_closed = true;
+            await league.save();
+            chai.request(server)
+            .post('/league/join')
+            .send({ invite_code : league.invite_code })
+            .set(TOKEN_HEADER, tokenUserTwo)
+            .then(res => {
+                expect(res).to.have.status(400);
+                expect(res.body.message).to.equal(leagueErrors.LEAGUE_CLOSED)
+                resolve();
+            })
+            .catch(reject)
+        })        
+    })
+
+    it('should fail if league is full.', () => {
+        return new Promise(async function (resolve, reject) {
+            const league = await LeagueService.loadLeague(1);
+            league.is_closed = false;
+            league.max_participants = 2;
+            await league.save()
+            chai.request(server)
+            .post('/league/join')
+            .send({ invite_code : league.invite_code })
+            .set(TOKEN_HEADER, tokenUserThree)
+            .then(res => {
+                expect(res).to.have.status(400);
+                expect(res.body.message).to.equal(leagueErrors.LEAGUE_FULL)
+                resolve();
+            })
+            .catch(reject)
+        })
+    })
+    it('should fail if league is full.', () => {
+        return new Promise(async function (resolve, reject) {
+            const league = await LeagueService.loadLeague(1);
+            league.is_closed = false;
+            league.max_participants = 2;
+            await league.save()
+            chai.request(server)
+            .post('/league/join')
+            .send({ invite_code : league.invite_code })
+            .set(TOKEN_HEADER, tokenUserThree)
+            .then(res => {
+                expect(res).to.have.status(400);
+                expect(res.body.message).to.equal(leagueErrors.LEAGUE_FULL)
+                resolve();
+            })
+            .catch(reject)
+        })
+    })
+
+})
+
+describe('PUT /league/:leagueId/leave', () => {
+    let tokenUserTwo = AuthService.generateToken({ id : 2 });
+    let tokenUserThree = AuthService.generateToken({ id : 3 });
+    it('should leave a league successfully', (done) => {
+        chai.request(server)
+        .put('/league/1/leave')
+        .set(TOKEN_HEADER, tokenUserTwo)
+        .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equal(leagueMessages.LEAGUE_EXIT_SUCCESS)
+        })
+        .then(async () => {
+            const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 1}});
+            if(userInLeague) throw new Error("User still present in league.")
+            done();
+        })
+        .catch(done)
+    })
+
+    it('should fail if user is not a participant', (done) => {
+        chai.request(server)
+        .put('/league/1/leave')
+        .set(TOKEN_HEADER, tokenUserThree)
+        .then(res => {
+            expect(res).to.have.status(400);
+            expect(res.body.message).to.equal(leagueErrors.NOT_A_PARTICIPANT)
+            done()
+        })
+        .catch(done)
+    })
+})
+
+describe('DELETE /league/:leagueId', () => {
+    let token = AuthService.generateToken({ id : 1 });
+    it('should delete league successfully.', (done) => {
+        chai.request(server)
+        .delete('/league/1')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            console.log(res.body)
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equal(leagueMessages.LEAGUE_DELETE_SUCCESS);
+            done()
+        })
+        .catch(done)
     })
 })

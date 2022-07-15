@@ -22,11 +22,21 @@ const LeagueController = {
             const leagueChanges = {};
             if(name) leagueChanges.name = name;
             if(max_participants) leagueChanges.max_participants = max_participants;
-            if(is_closed) leagueChanges.is_closed = is_closed;
+            if(typeof is_closed === 'boolean') leagueChanges.is_closed = is_closed;
 
             const data = await LeagueService.updateLeague(req.userId , req.params.leagueId, leagueChanges);
 
             return successResponse(res, leagueMessages.LEAGUE_UPDATE_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async deleteLeague(req, res, next) {
+        try {
+            const data = await LeagueService.deleteLeague(req.userId, req.params.leagueId);
+
+            return successResponse(res, leagueMessages.LEAGUE_DELETE_SUCCESS, data);
         } catch (error) {
             next(error);
         }
@@ -37,6 +47,27 @@ const LeagueController = {
             const data = await LeagueService.regenerateCode(req.userId, req.params.leagueId);
 
             return successResponse(res, leagueMessages.NEW_CODE_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async joinLeague(req, res, next) {
+        try {
+            const { invite_code } = req.body;
+            const data = await LeagueService.joinLeague(req.userId, invite_code);
+
+            return successResponse(res, leagueMessages.LEAGUE_JOIN_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async leaveLeague(req, res, next) {
+        try {
+            const data = await LeagueService.leaveLeague(req.userId, req.params.leagueId);
+
+            return successResponse(res, leagueMessages.LEAGUE_EXIT_SUCCESS, data);
         } catch (error) {
             next(error);
         }

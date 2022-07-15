@@ -13,6 +13,12 @@ module.exports = {
     },
     leagueErrors : {
         LEAGUE_NOT_FOUND : 'League not found.',
-        LEAGUE_PERMISSION_ERROR : 'Only the league admin can perform this action.'
+        LEAGUE_PERMISSION_ERROR : 'Only the league admin can perform this action.',
+        INVALID_LEAGUE_CODE : 'The invite code is invalid, expired, or has been revoked by the league admin.',
+        LEAGUE_CLOSED : 'The league is closed to new entries.',
+        LEAGUE_FULL : 'The league has reached its players limit.',
+        LEAGUE_ALREADY_JOINED : 'You are already participating in this league.',
+        LEAGUES_MAXED : 'You have joined the maximum number of leagues allowed.',
+        NOT_A_PARTICIPANT : 'You are not participating in this league.'
     }
 };

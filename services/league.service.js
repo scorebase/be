@@ -2,7 +2,9 @@ const { customAlphabet } = require('nanoid');
 
 const sequelize = require('../config/db');
 const { leagueErrors } = require('../errors');
-const { NotFoundError, ForbiddenError } = require('../errors/http_errors');
+const { NotFoundError, ForbiddenError, ServiceError } = require('../errors/http_errors');
+const { LEAGUE_CODE_LENGTH, MAX_LEAGUES_PER_PLAYER } = require('../helpers/constants');
+const logger = require('../logger');
 const League = require('../models/league.model');
 const LeagueMember = require('../models/league_member.model');
 
@@ -18,12 +20,13 @@ class LeagueService {
      * @returns {object}
      */
     static async createLeague(userId, name, max_participants, type, starting_gameweek) {
+        //ensure user has not joined maximum number of leagues allowed.
+        this.validateUserLeaguesCount(userId);
+
         const t = await sequelize.transaction();
 
         try {
             const invite_code = this.generateLeagueCode();
-
-            //TODO : check if the user has already joined maximum number of leagues allowed.
 
             const league = await League.create({
                 name,
@@ -34,7 +37,7 @@ class LeagueService {
                 administrator_id : userId
             }, { transaction : t });
     
-            //auomatically add the creator to the league
+            //automatically add the creator to the league
             await LeagueMember.create({
                 player_id : userId,
                 league_id : league.id
@@ -67,6 +70,19 @@ class LeagueService {
     }
 
     /**
+     * Delete a league
+     * @param {*} userId
+     * @param {*} leagueId
+     */
+    static async deleteLeague(userId, leagueId) {
+        const league = await this.loadLeague(leagueId);
+
+        this.validateLeagueAdmin(userId, league.administrator_id);
+
+        await league.destroy();
+    }
+
+    /**
      * Generate a new code for league
      * @param {*} userId
      * @param {*} leagueId
@@ -89,15 +105,66 @@ class LeagueService {
     }
 
     /**
+     * @param {number} userId id of the user that want to join league
+     * @param {string} invite_code League invite code
+     */
+    static async joinLeague(userId, invite_code) {
+        //ensure user has not joined maximum number of leagues allowed.
+        await this.validateUserLeaguesCount(userId);
+
+        const league = await League.findOne({
+            where : { invite_code }, raw : true,
+            attributes : ['is_closed', 'id', 'max_participants']
+        });
+
+        if(!league) throw new NotFoundError(leagueErrors.INVALID_LEAGUE_CODE);
+
+        //if league is closed to new entries
+        if(league.is_closed) throw new ServiceError(leagueErrors.LEAGUE_CLOSED);
+
+        //check if user is already in the league
+        const alreadyInLeague = await LeagueMember.count({ where : { league_id : league.id, player_id : userId }});
+        if(alreadyInLeague) throw new ServiceError(leagueErrors.LEAGUE_ALREADY_JOINED);
+
+        //ensure the league has not reached its maximum number of participants
+        const current_participants = await LeagueMember.count({ where : { league_id : league.id }});
+        logger.debug({ current_participants, max : league.max_participants });
+        if(current_participants >= league.max_participants) throw new ServiceError(leagueErrors.LEAGUE_FULL);
+
+        //else add user to the league
+        await LeagueMember.create({
+            player_id : userId,
+            league_id : league.id
+        });
+
+        //do not return anything. User will only get a succes message.
+        return;
+    }
+    /**
+     * @param {number} userId id of the user that want to leave league
+     * @param {string} leagueId League id
+     */
+    static async leaveLeague(userId, leagueId) {
+        //check if user is in league
+        const isLeagueMember = await LeagueMember.findOne({
+            where : { league_id : leagueId, player_id : userId },
+            attributes : ['id']
+        });
+        if(!isLeagueMember) throw new ServiceError(leagueErrors.NOT_A_PARTICIPANT);
+
+        await isLeagueMember.destroy();
+
+        return;
+    }
+
+    /**
      * Load a league by its id
-     * @param {*} id
+     * @param {number} id
      * @returns {object} League details
      */
     static async loadLeague(id) {
         const league = await League.findByPk(id);
-
         if(!league) throw new NotFoundError(leagueErrors.LEAGUE_NOT_FOUND);
-
         return league;
     }
 
@@ -105,19 +172,30 @@ class LeagueService {
      * Ensures a user is the admin of a league
      * @param {number} userId
      * @param {number} adminId
-     * @throws {ForbiddenError}
+     * @throws ForbiddenError
      */
     static validateLeagueAdmin(userId, adminId) {
         if(userId !== adminId){
             throw new ForbiddenError(leagueErrors.LEAGUE_PERMISSION_ERROR);
         };
     }
+
+    /**
+     * Method to make sure a user has not joined maximum number of leagues allowed
+     * @param {number} userId
+     * @throws ServiceError
+     */
+    static async validateUserLeaguesCount(userId) {
+        const count = await LeagueMember.count({ where : { player_id : userId }});
+        if(count >= MAX_LEAGUES_PER_PLAYER) throw new ServiceError(leagueErrors.LEAGUES_MAXED);
+    }
+
     /**
      * Generate code for a league
      * @returns {string} Generated league code
      */
     static generateLeagueCode() {
-        const nanoid = customAlphabet(alphabet, 7);
+        const nanoid = customAlphabet(alphabet, LEAGUE_CODE_LENGTH);
         return nanoid();
     }
 }
