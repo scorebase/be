@@ -206,6 +206,28 @@ class LeagueService {
     }
 
     /**
+     * Retrieve list of suspended players
+     * @param {number} leagueId
+     * @param {number} userId id of person making request (must be league admin)
+     */
+    static async suspendedPlayersList(leagueId, userId) {
+        const league = await this.loadLeague(leagueId);
+        this.validateLeagueAdmin(userId, league.administrator_id);
+
+        const suspended = await LeagueMember.findAll({
+            where : { league_id : leagueId, is_suspended : true },
+            raw : true,
+            include : {
+                association : 'player',
+                attributes : []
+            },
+            attributes : ['player.id', 'player.username', 'player.full_name']
+        });
+
+        return suspended;
+    }
+
+    /**
      * Load a league by its id
      * @param {number} id
      * @returns {object} League details

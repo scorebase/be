@@ -93,6 +93,16 @@ const LeagueController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    async getLeagueSuspendedPlayers(req, res, next) {
+        try {
+            const data = await LeagueService.suspendedPlayersList(req.params.leagueId, req.userId);
+
+            return successResponse(res, leagueMessages.SUSPENDED_LIST_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
     }
 };
 

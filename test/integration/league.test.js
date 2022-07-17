@@ -11,6 +11,7 @@ const { leagueMessages } = require('../../helpers/messages');
 const LeagueService = require('../../services/league.service');
 const League = require('../../models/league.model');
 const LeagueMember = require('../../models/league_member.model');
+const users = require('../helpers/users.mock');
 
 chai.use(chaiHttp);
 
@@ -392,7 +393,7 @@ describe('PUT /league/:leagueId/restore/:playerId', () => {
     let token = AuthService.generateToken({ id : 1 });
     it('should restore player successfully', (done) => {
         chai.request(server)
-        .put('/league/1/restore/2')
+        .put('/league/1/restore/4')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(200);
@@ -403,11 +404,31 @@ describe('PUT /league/:leagueId/restore/:playerId', () => {
     })
     it('should fail if player is not in suspended league', (done) => {
         chai.request(server)
-        .put('/league/1/restore/2')
+        .put('/league/1/restore/4')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(404);
             expect(res.body.message).to.equal(leagueErrors.PLAYER_NOT_IN_SUSPENDED_LIST)
+            done()
+        })
+        .catch(done)
+    })
+})
+
+describe('GET /league/:leagueId/suspended', () => {
+    let token = AuthService.generateToken({ id : 1 });
+    it('should retrieve list of suspended players.', (done) => {
+        chai.request(server)
+        .get('/league/1/suspended')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(200);
+            const schema = joi.array().items(joi.object({
+                id: joi.number().integer().required(),
+                username: joi.string().valid(users[1].username).required(),
+                full_name: joi.string().valid(users[1].fullName).required()
+            }))
+            joi.assert(res.body.data, schema)
             done()
         })
         .catch(done)
