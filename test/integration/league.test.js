@@ -340,7 +340,7 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
-    describe('PUT /legue/:leagueId/suspend?username={username}', () => {
+    describe('PUT /league/:leagueId/suspend?username={username}', () => {
         let token = AuthService.generateToken({ id : 1 })
         before(async () => {
             await LeagueMember.create({

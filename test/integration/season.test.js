@@ -26,9 +26,7 @@ chai.use(chaiHttp);
 
 describe(' Season Test /season', () => {
     before(async () => {
-        await User.sync({ force: true });
         await Season.sync({ force: true });
-        await User.create(users[0]);
         await Season.create(seasons[0]);
     });
 

@@ -45,10 +45,8 @@ chai.use(chaiHttp);
 
 describe('Gameweek Test  /gameweek', () => {
     before(async () => {
-        await User.sync({ force: true });
         await Season.sync({ force: true });
         await Gameweek.sync({ force: true });
-        await User.create(users[0]);
         await Season.create(seasons[0]);
         const gameweek = { ...gameweeks[0], season_id: gameweeks[0].seasonId };
         delete gameweek['seasonId'];

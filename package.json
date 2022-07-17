@@ -7,7 +7,7 @@
     "dev": "nodemon index",
     "start": "node index",
     "test:unit": "NODE_ENV=test nyc _mocha test/unit/* --exit",
-    "test:integration": "NODE_ENV=test nyc _mocha test/integration/* --exit",
+    "test:integration": "NODE_ENV=test nyc _mocha test/integration/* --timeout 5000 --exit",
     "test:all": "npm run test:unit && npm run test:integration",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
