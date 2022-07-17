@@ -22,6 +22,7 @@ module.exports = {
         NOT_A_PARTICIPANT : 'You are not participating in this league.',
         PLAYER_NOT_IN_LEAGUE : 'Player not in league.',
         SUSPENDED_FROM_LEAGUE : 'You have been suspended from this league.',
-        PLAYER_NOT_IN_SUSPENDED_LIST : 'Player is not in the list of suspended players.'
+        PLAYER_NOT_IN_SUSPENDED_LIST : 'Player is not in the list of suspended players.',
+        ADMIN_NO_LEAVE : 'You cannot leave this league. Change the administrator to leave'
     }
 };

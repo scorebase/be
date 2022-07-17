@@ -295,6 +295,7 @@ describe('PUT /league/join', () => {
 })
 
 describe('PUT /league/:leagueId/leave', () => {
+    let token = AuthService.generateToken({ id : 1 })
     let tokenUserTwo = AuthService.generateToken({ id : 2 });
     let tokenUserThree = AuthService.generateToken({ id : 3 });
     it('should leave a league successfully', (done) => {
@@ -320,6 +321,18 @@ describe('PUT /league/:leagueId/leave', () => {
         .then(res => {
             expect(res).to.have.status(400);
             expect(res.body.message).to.equal(leagueErrors.NOT_A_PARTICIPANT)
+            done()
+        })
+        .catch(done)
+    })
+
+    it('should not allow an admin to leave', (done) => {
+        chai.request(server)
+        .put('/league/1/leave')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(400);
+            expect(res.body.message).to.equal(leagueErrors.ADMIN_NO_LEAVE)
             done()
         })
         .catch(done)

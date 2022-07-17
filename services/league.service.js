@@ -151,6 +151,10 @@ class LeagueService {
      * @param {string} leagueId League id
      */
     static async leaveLeague(userId, leagueId) {
+        const league = await this.loadLeague(leagueId);
+        //ensure an admin can't leave their own league
+        if(league.administrator_id === userId) throw new ServiceError(leagueErrors.ADMIN_NO_LEAVE);
+
         //check if user is in league
         const isLeagueMember = await LeagueMember.findOne({
             where : { league_id : leagueId, player_id : userId }
