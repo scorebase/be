@@ -27,7 +27,9 @@ GameWeek.init(
 );
 
 GameWeek.belongsTo(Season, {
-    foreignKey: 'season_id'
+    foreignKey: 'season_id',
+    onDelete: 'cascade',
+    onUpdate: 'cascade'
 });
 
 module.exports = GameWeek;

@@ -4,6 +4,7 @@ const chaiHttp = require('chai-http');
 const joi = require('joi');
 
 const server = require('../..');
+const sequelize = require('../../config/db');
 const { authErrors } = require('../../errors');
 const { TOKEN_HEADER } = require('../../helpers/constants');
 const { authMessages } = require('../../helpers/messages');
@@ -16,6 +17,8 @@ chai.use(chaiHttp);
 
 before(async () => {
     await User.sync({ force : true });
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', { raw: true });
+    await sequelize.sync({ force : true });
     await User.create(users[0]);
 });
 

@@ -9,6 +9,12 @@ module.exports = {
         SEASON_UPDATED_SUCCESS: 'This season has been updated successfully.',
         SEASON_LOADED_SUCCESS: 'This season has been loaded successfully.',
         SEASON_DELETED_SUCCESS: 'This season has been deleted successfully.'
+    },
+    gameweekMessages: {
+        GAMEWEEK_CREATED_SUCCESS: 'This gameweek has been created successfully.',
+        GAMEWEEK_UPDATED_SUCCESS: 'This gameweek has been updated successfully.',
+        GAMEWEEK_LOADED_SUCCESS: 'This gameweek has been loaded successfully.',
+        GAMEWEEK_DELETED_SUCCESS: 'This gameweek has been deleted successfully.'
     }
 };
 

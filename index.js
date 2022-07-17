@@ -7,7 +7,8 @@ const sequelize = require('./config/db');
 ///routes
 const authRouter = require('./routes/auth.route');
 const userRouter = require('./routes/user.route');
-const SeasonRouter = require('./routes/season.route');
+const seasonRouter = require('./routes/season.route');
+const gameweekRouter = require('./routes/gameweek.route');
 
 const server = express();
 
@@ -25,7 +26,8 @@ server.get('/', (req, res) => {
 
 server.use('/auth', authRouter);
 server.use('/user', userRouter);
-server.use('/season', SeasonRouter);
+server.use('/season', seasonRouter);
+server.use('/gameweek', gameweekRouter);
 
 //Handle all errors
 /* eslint-disable */ 
