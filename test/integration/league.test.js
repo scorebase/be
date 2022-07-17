@@ -325,7 +325,7 @@ describe('PUT /league/:leagueId/leave', () => {
         .catch(done)
     })
 })
-describe('DELETE /legue/:leagueId/player?username={username}', () => {
+describe('DELETE /legue/:leagueId/suspend?username={username}', () => {
     let token = AuthService.generateToken({ id : 1 })
     before(async () => {
         await LeagueMember.create({
@@ -337,7 +337,7 @@ describe('DELETE /legue/:leagueId/player?username={username}', () => {
 
     it('should remove player successfully.', (done) => {
         chai.request(server)
-        .delete('/league/1/player?username=usernameTwo')
+        .put('/league/1/suspend?username=usernameTwo')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(200);
@@ -353,7 +353,7 @@ describe('DELETE /legue/:leagueId/player?username={username}', () => {
 
     it('should fail if username does not exist', (done) => {
         chai.request(server)
-        .delete('/league/1/player?username=usernam')
+        .put('/league/1/suspend?username=usernam')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(404)
@@ -364,7 +364,7 @@ describe('DELETE /legue/:leagueId/player?username={username}', () => {
 
     it('should fail if player with username is not in league', (done) => {
         chai.request(server)
-        .delete('/league/1/player?username=usernameTwo')
+        .put('/league/1/suspend?username=usernameTwo')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(404)

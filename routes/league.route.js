@@ -23,6 +23,6 @@ leagueRouter.post('/join', validateBody(joinLeagueSchema), isLoggedIn, LeagueCon
 
 leagueRouter.put('/:leagueId/leave', isLoggedIn, LeagueController.leaveLeague);
 
-leagueRouter.delete('/:leagueId/player', validateQuery(removePlayerSchema), isLoggedIn, LeagueController.removePlayer);
+leagueRouter.put('/:leagueId/suspend', validateQuery(removePlayerSchema), isLoggedIn, LeagueController.removePlayer);
 
 module.exports = leagueRouter;
