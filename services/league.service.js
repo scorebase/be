@@ -163,8 +163,9 @@ class LeagueService {
     }
     /**
      * Remove a player from a league
-     * @param {number} playerId
+     * @param {number} playerId (id of player to suspend)
      * @param {number} leagueId
+     * @param {number} userId id of person making request (must be league admin)
      */
     static async removePlayer(playerId, leagueId, userId) {
         const league = await this.loadLeague(leagueId);
@@ -178,6 +179,26 @@ class LeagueService {
         isLeagueMember.is_suspended = true;
 
         await isLeagueMember.save();
+    }
+
+    /**
+     * Restore a player to a league
+     * @param {number} playerId (id of player to restore)
+     * @param {number} leagueId
+     * @param {number} userId id of person making request (must be league admin)
+     */
+    static async restorePlayer(playerId, leagueId, userId) {
+        const league = await this.loadLeague(leagueId);
+        this.validateLeagueAdmin(userId, league.administrator_id);
+
+        const isLeagueSuspendedMember = await LeagueMember.findOne({
+            where : { league_id : leagueId, player_id : playerId, is_suspended : true }
+        });
+        if(!isLeagueSuspendedMember) throw new NotFoundError(leagueErrors.PLAYER_NOT_IN_SUSPENDED_LIST);
+
+        isLeagueSuspendedMember.is_suspended = false;
+
+        await isLeagueSuspendedMember.save();
     }
 
     /**

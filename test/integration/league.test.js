@@ -325,7 +325,7 @@ describe('PUT /league/:leagueId/leave', () => {
         .catch(done)
     })
 })
-describe('DELETE /legue/:leagueId/suspend?username={username}', () => {
+describe('PUT /legue/:leagueId/suspend?username={username}', () => {
     let token = AuthService.generateToken({ id : 1 })
     before(async () => {
         await LeagueMember.create({
@@ -375,6 +375,31 @@ describe('DELETE /legue/:leagueId/suspend?username={username}', () => {
     })
 })
 
+describe('PUT /league/:leagueId/restore/:playerId', () => {
+    let token = AuthService.generateToken({ id : 1 });
+    it('should restore player successfully', (done) => {
+        chai.request(server)
+        .put('/league/1/restore/2')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equal(leagueMessages.PLAYER_RESTORE_SUCCESS)
+            done()
+        })
+        .catch(done)
+    })
+    it('should fail if player is not in suspended league', (done) => {
+        chai.request(server)
+        .put('/league/1/restore/2')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(404);
+            expect(res.body.message).to.equal(leagueErrors.PLAYER_NOT_IN_SUSPENDED_LIST)
+            done()
+        })
+        .catch(done)
+    })
+})
 
 describe('DELETE /league/:leagueId', () => {
     let token = AuthService.generateToken({ id : 1 });

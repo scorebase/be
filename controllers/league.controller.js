@@ -83,6 +83,16 @@ const LeagueController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    async restorePlayer(req, res, next) {
+        try {
+            const data = await LeagueService.restorePlayer(req.params.playerId, req.params.leagueId, req.userId);
+
+            return successResponse(res, leagueMessages.PLAYER_RESTORE_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
     }
 };
 
