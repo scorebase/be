@@ -175,6 +175,28 @@ describe(' Season Test /season', () => {
               })
               .catch(done)
           })
+
+          it('It return an error if the updated season name already exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const newSeason = { ...seasons[0], season_name: seasons[1].season_name };
+            chai
+              .request(server)
+              .put('/season/1')
+              .set(TOKEN_HEADER, validToken)
+              .send(newSeason)
+              .then((res) => {
+                expect(res).to.have.status(400);
+                const schema = joi.object({
+                  status: 'error',
+                  message: joi.string().valid(SEASON_NAME_EXISTS),
+                  data: null,
+                });
+        
+                joi.assert(res.body, schema);
+                done();
+              })
+              .catch(done);
+          });
       })
       
       describe('DELETE /season/:seasonId', () => {

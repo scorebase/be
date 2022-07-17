@@ -1,4 +1,5 @@
 const Season = require('../models/season.model');
+const { Op } = require('sequelize');
 const { NotFoundError, ServiceError } = require('../errors/http_errors');
 const { seasonErrors } = require('../errors');
 
@@ -44,6 +45,16 @@ class SeasonService {
         const seasonExists = await Season.findByPk(seasonId);
         if(!seasonExists){
             throw new NotFoundError(SEASON_NOT_FOUND);
+        }
+
+        const seasonName = await Season.findOne({
+            where:
+            { season_name : season_name,
+                id: { [Op.ne] : seasonId }
+            }});
+
+        if(seasonName){
+            throw new ServiceError(SEASON_NAME_EXISTS);
         }
 
         await Season.update({ season_name }, { where: { id : seasonId }});
