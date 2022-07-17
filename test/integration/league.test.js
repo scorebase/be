@@ -172,6 +172,7 @@ describe('PUT /league/join', () => {
     let token = AuthService.generateToken({ id : 1 });
     let tokenUserTwo = AuthService.generateToken({ id : 2 });
     let tokenUserThree = AuthService.generateToken({ id : 3 });
+    let tokenUserFour = AuthService.generateToken({ id : 4 });
     it('join league successfully.', () => {
         return new Promise(async function (resolve, reject) {
             const { invite_code } = await League.findByPk(1);
@@ -242,7 +243,7 @@ describe('PUT /league/join', () => {
             chai.request(server)
             .post('/league/join')
             .send({ invite_code : league.invite_code })
-            .set(TOKEN_HEADER, tokenUserTwo)
+            .set(TOKEN_HEADER, tokenUserThree)
             .then(res => {
                 expect(res).to.have.status(400);
                 expect(res.body.message).to.equal(leagueErrors.LEAGUE_CLOSED)
@@ -270,25 +271,27 @@ describe('PUT /league/join', () => {
             .catch(reject)
         })
     })
-    it('should fail if league is full.', () => {
+
+    it('should fail if user is suspended from league', () => {
         return new Promise(async function (resolve, reject) {
-            const league = await LeagueService.loadLeague(1);
-            league.is_closed = false;
-            league.max_participants = 2;
-            await league.save()
+            const { invite_code } = await LeagueService.loadLeague(1);
+            await LeagueMember.create({
+                player_id : 4,
+                league_id : 1,
+                is_suspended : true
+            });
             chai.request(server)
             .post('/league/join')
-            .send({ invite_code : league.invite_code })
-            .set(TOKEN_HEADER, tokenUserThree)
+            .send({ invite_code })
+            .set(TOKEN_HEADER, tokenUserFour)
             .then(res => {
                 expect(res).to.have.status(400);
-                expect(res.body.message).to.equal(leagueErrors.LEAGUE_FULL)
+                expect(res.body.message).to.equal(leagueErrors.SUSPENDED_FROM_LEAGUE)
                 resolve();
             })
             .catch(reject)
         })
     })
-
 })
 
 describe('PUT /league/:leagueId/leave', () => {

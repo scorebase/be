@@ -123,9 +123,14 @@ class LeagueService {
         if(league.is_closed) throw new ServiceError(leagueErrors.LEAGUE_CLOSED);
 
         //check if user is already in the league
-        const alreadyInLeague = await LeagueMember.count({ where : { league_id : league.id, player_id : userId }});
-        if(alreadyInLeague) throw new ServiceError(leagueErrors.LEAGUE_ALREADY_JOINED);
+        const alreadyInLeague = await LeagueMember.findOne({ where : { league_id : league.id, player_id : userId }});
+        if(alreadyInLeague) {
+            //if user has been suspended from league
+            if(alreadyInLeague.is_suspended) throw new ServiceError(leagueErrors.SUSPENDED_FROM_LEAGUE);
 
+            throw new ServiceError(leagueErrors.LEAGUE_ALREADY_JOINED);
+        }
+        
         //ensure the league has not reached its maximum number of participants
         const current_participants = await LeagueMember.count({ where : { league_id : league.id }});
         logger.debug({ current_participants, max : league.max_participants });
