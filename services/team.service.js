@@ -73,6 +73,31 @@ class teamService {
             throw new NotFoundError(TEAM_NOT_FOUND);
         }
 
+        const teamUpdatedValues = await Team.findOne({
+            where: {
+                [Op.or]: [
+                    { name: team.name },
+                    { short_name: team.short_name },
+                    { jersey: team.jersey }
+                ],
+                id: {
+                    [Op.ne] : team.id
+                }
+            }});
+
+        if(teamUpdatedValues){
+            if(teamUpdatedValues.name === team.name){
+                // similar name
+                throw new ServiceError(TEAM_NAME_EXISTS);
+            }else if(teamUpdatedValues.short_name === team.short_name){
+                // similar short_name
+                throw new ServiceError(TEAM_SHORTNAME_EXISTS);
+            }else{
+                // similar jersey url
+                throw new ServiceError(TEAM_JERSEY_EXISTS);
+            }
+        }
+
         const updatedTeam = await Team.update(team, { where: { id : team.id }});
         return updatedTeam;
     }
