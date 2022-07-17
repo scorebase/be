@@ -4,7 +4,6 @@ const sequelize = require('../config/db');
 const { leagueErrors } = require('../errors');
 const { NotFoundError, ForbiddenError, ServiceError } = require('../errors/http_errors');
 const { LEAGUE_CODE_LENGTH, MAX_LEAGUES_PER_PLAYER } = require('../helpers/constants');
-const logger = require('../logger');
 const League = require('../models/league.model');
 const LeagueMember = require('../models/league_member.model');
 
@@ -132,8 +131,10 @@ class LeagueService {
         }
         
         //ensure the league has not reached its maximum number of participants
-        const current_participants = await LeagueMember.count({ where : { league_id : league.id }});
-        logger.debug({ current_participants, max : league.max_participants });
+        const current_participants = await LeagueMember.count({
+            where : { league_id : league.id, is_suspended : false }
+        });
+
         if(current_participants >= league.max_participants) throw new ServiceError(leagueErrors.LEAGUE_FULL);
 
         //else add user to the league
