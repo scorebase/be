@@ -4,6 +4,3 @@ node_modules/
 
 coverage/
 .nyc_output
-
-dump.txt
-package-lock.json
