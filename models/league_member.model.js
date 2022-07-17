@@ -13,6 +13,11 @@ LeagueMember.init({
     player_id: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    is_suspended : {
+        type: DataTypes.BOOLEAN,
+        defaultValue : false,
+        comment : 'If a player has been suspended from a league.'
     }
 }, {
     sequelize,
