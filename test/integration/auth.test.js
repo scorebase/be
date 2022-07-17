@@ -16,7 +16,7 @@ chai.use(chaiHttp);
 
 
 before(async () => {
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true})
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}) //a hack for now
     await sequelize.sync({ force : true });
     await User.create(users[0]);
 });
