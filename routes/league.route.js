@@ -2,8 +2,12 @@ const express = require('express');
 
 const LeagueController = require('../controllers/league.controller');
 const { isLoggedIn } = require('../middlewares/auth.middleware');
-const { validateBody } = require('../validators');
-const { createLeagueSchema, updateLeagueSchema, joinLeagueSchema } = require('../validators/league.validator');
+const { validateBody, validateQuery } = require('../validators');
+const { createLeagueSchema,
+    updateLeagueSchema,
+    joinLeagueSchema,
+    removePlayerSchema
+} = require('../validators/league.validator');
 
 const leagueRouter = express.Router();
 
@@ -18,5 +22,7 @@ leagueRouter.put('/:leagueId/code', isLoggedIn, LeagueController.regenerateLeagu
 leagueRouter.post('/join', validateBody(joinLeagueSchema), isLoggedIn, LeagueController.joinLeague);
 
 leagueRouter.put('/:leagueId/leave', isLoggedIn, LeagueController.leaveLeague);
+
+leagueRouter.delete('/:leagueId/player', validateQuery(removePlayerSchema), isLoggedIn, LeagueController.removePlayer);
 
 module.exports = leagueRouter;

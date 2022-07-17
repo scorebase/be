@@ -15,6 +15,9 @@ const leagueValidator = {
     }),
     joinLeagueSchema : joi.object({
         invite_code : joi.string().alphanum().length(LEAGUE_CODE_LENGTH).required()
+    }),
+    removePlayerSchema : joi.object({
+        username: joi.string().alphanum().min(3).max(30).required()
     })
 };
 

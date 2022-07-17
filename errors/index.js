@@ -19,6 +19,8 @@ module.exports = {
         LEAGUE_FULL : 'The league has reached its players limit.',
         LEAGUE_ALREADY_JOINED : 'You are already participating in this league.',
         LEAGUES_MAXED : 'You have joined the maximum number of leagues allowed.',
-        NOT_A_PARTICIPANT : 'You are not participating in this league.'
+        NOT_A_PARTICIPANT : 'You are not participating in this league.',
+        PLAYER_NOT_IN_LEAGUE : 'Player not in league.',
+        SUSPENDED_FROM_LEAGUE : 'You have been suspended from this league.'
     }
 };

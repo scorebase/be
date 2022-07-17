@@ -1,6 +1,7 @@
 const { leagueMessages } = require('../helpers/messages');
 const successResponse = require('../helpers/success_response');
 const LeagueService = require('../services/league.service');
+const UserService = require('../services/user.service');
 
 const LeagueController = {
     async createLeague(req, res, next) {
@@ -68,6 +69,17 @@ const LeagueController = {
             const data = await LeagueService.leaveLeague(req.userId, req.params.leagueId);
 
             return successResponse(res, leagueMessages.LEAGUE_EXIT_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async removePlayer(req, res, next) {
+        try {
+            const { id : playerId }  = await UserService.loadByUserName(req.query.username);
+            const data = await LeagueService.removePlayer(playerId, req.params.leagueId, req.userId);
+
+            return successResponse(res, leagueMessages.PLAYER_REMOVE_SUCCESS, data);
         } catch (error) {
             next(error);
         }

@@ -10,7 +10,8 @@ module.exports = {
         NEW_CODE_SUCCESS : 'New code generated.',
         LEAGUE_JOIN_SUCCESS : 'You have entered the league.',
         LEAGUE_EXIT_SUCCESS : 'You have exited the league.',
-        LEAGUE_DELETE_SUCCESS : 'League has been deleted successfully.'
+        LEAGUE_DELETE_SUCCESS : 'League has been deleted successfully.',
+        PLAYER_REMOVE_SUCCESS : 'Player has been rmeoved from your league.'
     }
 };
 

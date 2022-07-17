@@ -147,14 +147,31 @@ class LeagueService {
     static async leaveLeague(userId, leagueId) {
         //check if user is in league
         const isLeagueMember = await LeagueMember.findOne({
-            where : { league_id : leagueId, player_id : userId },
-            attributes : ['id']
+            where : { league_id : leagueId, player_id : userId }
         });
         if(!isLeagueMember) throw new ServiceError(leagueErrors.NOT_A_PARTICIPANT);
 
         await isLeagueMember.destroy();
 
         return;
+    }
+    /**
+     * Remove a player from a league
+     * @param {number} playerId
+     * @param {number} leagueId
+     */
+    static async removePlayer(playerId, leagueId, userId) {
+        const league = await this.loadLeague(leagueId);
+        this.validateLeagueAdmin(userId, league.administrator_id);
+
+        const isLeagueMember = await LeagueMember.findOne({
+            where : { league_id : leagueId, player_id : playerId }
+        });
+        if(!isLeagueMember || isLeagueMember.is_suspended) throw new NotFoundError(leagueErrors.PLAYER_NOT_IN_LEAGUE);
+
+        isLeagueMember.is_suspended = true;
+
+        await isLeagueMember.save();
     }
 
     /**

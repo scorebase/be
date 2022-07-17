@@ -322,6 +322,56 @@ describe('PUT /league/:leagueId/leave', () => {
         .catch(done)
     })
 })
+describe('DELETE /legue/:leagueId/player?username={username}', () => {
+    let token = AuthService.generateToken({ id : 1 })
+    before(async () => {
+        await LeagueMember.create({
+            player_id : 2,
+            league_id : 1
+        });
+    })
+    
+
+    it('should remove player successfully.', (done) => {
+        chai.request(server)
+        .delete('/league/1/player?username=usernameTwo')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body.message).to.equal(leagueMessages.PLAYER_REMOVE_SUCCESS)
+        })
+        .then(async () => {
+            const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 1}});
+            if(!userInLeague.is_suspended) throw new Error('User did not get suspemded.')
+            done();
+        })
+        .catch(done)
+    })
+
+    it('should fail if username does not exist', (done) => {
+        chai.request(server)
+        .delete('/league/1/player?username=usernam')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(404)
+            done()
+        })
+        .catch(done)
+    })
+
+    it('should fail if player with username is not in league', (done) => {
+        chai.request(server)
+        .delete('/league/1/player?username=usernameTwo')
+        .set(TOKEN_HEADER, token)
+        .then(res => {
+            expect(res).to.have.status(404)
+            expect(res.body.message).to.equal(leagueErrors.PLAYER_NOT_IN_LEAGUE)
+            done()
+        })
+        .catch(done)
+    })
+})
+
 
 describe('DELETE /league/:leagueId', () => {
     let token = AuthService.generateToken({ id : 1 });
@@ -330,7 +380,6 @@ describe('DELETE /league/:leagueId', () => {
         .delete('/league/1')
         .set(TOKEN_HEADER, token)
         .then(res => {
-            console.log(res.body)
             expect(res).to.have.status(200);
             expect(res.body.message).to.equal(leagueMessages.LEAGUE_DELETE_SUCCESS);
             done()
