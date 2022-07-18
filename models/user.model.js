@@ -72,7 +72,4 @@ User.init({
     }
 });
 
-// User.beforeCreate(User.hashPassword);
-// User.beforeUpdate(User.hashPassword);
-
 module.exports = User;
