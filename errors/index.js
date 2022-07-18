@@ -11,6 +11,12 @@ module.exports = {
     userErrors : {
         USER_NOT_FOUND : 'User not found'
     },
+    teamErrors : {
+        TEAM_NAME_EXISTS: 'A team with similar name already exist. Please choose another one.',
+        TEAM_SHORTNAME_EXISTS: 'A team with similar short name already exist. Please choose another one.',
+        TEAM_JERSEY_EXISTS: 'A team with similar jersey already exist. Please choose another one.',
+        TEAM_NOT_FOUND: 'Team not found'
+    },
     seasonErrors: {
         SEASON_NAME_EXISTS: 'There is a season with similar name. Please choose another one.',
         SEASON_NOT_FOUND: 'Season not found'
