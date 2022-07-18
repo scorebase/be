@@ -1,0 +1,336 @@
+const joi = require('joi');
+const {
+    expect
+} = require('chai');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const db = require('../../config/db');
+
+const server = require('../../index');
+const User = require('../../models/user.model');
+const Season = require('../../models/season.model');
+const Gameweek = require('../../models/gameweek.model');
+const {
+    TOKEN_HEADER
+} = require('../../helpers/constants');
+const AuthService = require('../../services/auth.service');
+const {
+    gameweekMessages
+} = require('../../helpers/messages');
+const {
+    gameweekErrors,
+    seasonErrors
+} = require('../../errors/index');
+const users = require('../helpers/users.mock');
+const gameweeks = require('../helpers/gameweek.mock');
+const seasons = require('../helpers/season.mock');
+
+const {
+    GAMEWEEK_CREATED_SUCCESS,
+    GAMEWEEK_LOADED_SUCCESS,
+    GAMEWEEK_UPDATED_SUCCESS,
+    GAMEWEEK_DELETED_SUCCESS,
+} = gameweekMessages;
+
+const {
+    GAMEWEEK_DEADLINE_ERROR,
+    GAMEWEEK_NOT_FOUND,
+    GAMEWEEK_TITLE_EXISTS
+} =
+gameweekErrors;
+
+const { SEASON_NOT_FOUND } = seasonErrors
+
+chai.use(chaiHttp);
+
+describe('Gameweek Test  /gameweek', () => {
+    before(async () => {
+        await Season.sync({ force: true });
+        await Gameweek.sync({ force: true });
+        await Season.create(seasons[0]);
+        const gameweek = { ...gameweeks[0], season_id: gameweeks[0].seasonId };
+        delete gameweek['seasonId'];
+        await Gameweek.create(gameweek);
+    });
+
+    describe('POST /gameweek', () => {
+        it('it should create a gameweek, if all fields are valid', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            chai
+                .request(server)
+                .post('/gameweek')
+                .set(TOKEN_HEADER, validToken)
+                .send(gameweeks[1])
+                .then((res) => {
+                    expect(res).to.have.status(200);
+                    const schema = joi.object({
+                        status: 'success',
+                        message: joi.string().valid(GAMEWEEK_CREATED_SUCCESS),
+                        data: joi.object({
+                            id: joi.number().integer().required(),
+                            deadline: joi.date().valid(new Date(gameweeks[1].deadline)),
+                            title: joi.string().valid(gameweeks[1].title),
+                            season_id: joi.number().integer().valid(gameweeks[1].seasonId),
+                            updatedAt: joi.date().required(),
+                            createdAt: joi.date().required(),
+                        }),
+                    });
+                    joi.assert(res.body, schema);
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('it should return error if gameweek title already exist in the season picked', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const gameweek = { ...gameweeks[1], title: gameweeks[0].title }
+
+            chai.request(server)
+            .post('/gameweek')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(400)
+
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(GAMEWEEK_TITLE_EXISTS),
+                    data: null
+                })
+                joi.assert(res.body, schema)
+                done();
+            })
+            .catch(done)
+        })
+
+        it('It should return an error if the deadline is in the past', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const gameweek = { ...gameweeks[2] }
+
+            chai.request(server)
+            .post('/gameweek')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(400)
+
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(GAMEWEEK_DEADLINE_ERROR),
+                    data: null
+                })
+                joi.assert(res.body, schema);
+                done();
+            })
+            .catch(done)
+        })
+
+        it('It should return an error if the season does not exist', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const gameweek = { ...gameweeks[0], seasonId: 2 };
+
+            chai.request(server)
+            .post('/gameweek')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(404);
+
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(SEASON_NOT_FOUND),
+                    data: null
+                })
+                joi.assert(res.body, schema);
+                done();
+            })
+            .catch(done)
+        })
+    });
+
+    describe('GET /gameweek/:gameweekId', () => {
+        it('It should load the requested gameweek if it exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+
+            chai.request(server)
+            .get('/gameweek/1')
+            .set(TOKEN_HEADER, validToken)
+            .then(res => {
+                expect(res).to.have.status(200)
+                const schema = joi.object({
+                    status: 'success',
+                    message: joi.string().valid(GAMEWEEK_LOADED_SUCCESS),
+                    data: joi.object({
+                        id: joi.number().integer().required(),
+                        deadline: joi.date().valid(new Date(gameweeks[0].deadline)),
+                        title: joi.string().valid(gameweeks[0].title),
+                        season_id: joi.number().integer().valid(gameweeks[0].seasonId),
+                        updatedAt: joi.date().required(),
+                        createdAt: joi.date().required(),
+                    }),
+                })
+
+                joi.assert(res.body, schema);
+                done();
+            })
+            .catch(done)
+        })
+
+        it('It should return an error if the gameweek does not exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            chai.request(server)
+            .get('/gameweek/4')
+            .set(TOKEN_HEADER, validToken)
+            .then(res => {
+                expect(res).to.have.status(404)
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(GAMEWEEK_NOT_FOUND),
+                    data: null
+                })
+
+                joi.assert(res.body, schema);
+                done()
+            })
+            .catch(done)
+        })
+    });
+
+    describe('PUT /gameweek/:gameweekId', () => {
+        it('It should update the gameweek if all fields are valid', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 })
+            const gameweek = { ...gameweeks[0], deadline: "2022-09-05", title: gameweeks[3].title }
+
+            chai.request(server)
+            .put('/gameweek/1')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(200)
+
+                const schema = joi.object({
+                    status: 'success',
+                    message: joi.string().valid(GAMEWEEK_UPDATED_SUCCESS),
+                    data: joi.object({
+                        title: joi.string().valid(gameweek.title),
+                        deadline: joi.date().valid(new Date(gameweek.deadline)),
+                        season_id: joi.number().integer().valid(gameweek.seasonId),
+                        id: joi.number().integer().required()
+                    })
+                })
+
+                joi.assert(res.body, schema)
+                done();
+            })
+            .catch(done);
+        })
+
+        it('it should return error if gameweek title to be updated already exist in the season picked', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const gameweek = { ...gameweeks[0], title: gameweeks[1].title }
+
+            chai.request(server)
+            .put('/gameweek/1')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(400)
+
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(GAMEWEEK_TITLE_EXISTS),
+                    data: null
+                })
+                joi.assert(res.body, schema)
+                done();
+            })
+            .catch(done)
+        })
+
+        it('It should return an error if the updated deadline is in the past', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const gameweek = { ...gameweeks[0], deadline: gameweeks[2].deadline }
+
+            chai.request(server)
+            .put('/gameweek/1')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(400)
+
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(GAMEWEEK_DEADLINE_ERROR),
+                    data: null
+                })
+                joi.assert(res.body, schema);
+                done();
+            })
+            .catch(done)
+        })
+
+        it('It should return an error if the updated season does not exist', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            const gameweek = { ...gameweeks[0], seasonId: 2 };
+
+            chai.request(server)
+            .put('/gameweek/1')
+            .set(TOKEN_HEADER, validToken)
+            .send(gameweek)
+            .then(res => {
+                expect(res).to.have.status(404);
+
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(SEASON_NOT_FOUND),
+                    data: null
+                })
+                joi.assert(res.body, schema);
+                done();
+            })
+            .catch(done)
+        })
+    })
+
+    describe('DELETE /gameweek/:gameweekId', () => {
+        it('it should successfully delete the requested gameweek, if the gameweek id is valid', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 })
+
+            chai.request(server)
+            .delete('/gameweek/1')
+            .set(TOKEN_HEADER, validToken)
+            .then(res => {
+                expect(res).to.have.status(200)
+
+                const schema = joi.object({
+                    status: 'success',
+                    message: joi.string().valid(GAMEWEEK_DELETED_SUCCESS),
+                    data: null
+                })
+
+                joi.assert(res.body, schema);
+                done()
+            })
+            .catch(done);
+        })
+
+        it('It should return an error if the requested gameweek does not exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            chai.request(server)
+            .delete('/gameweek/4')
+            .set(TOKEN_HEADER, validToken)
+            .then(res => {
+                expect(res).to.have.status(404)
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(GAMEWEEK_NOT_FOUND),
+                    data: null
+                })
+
+                joi.assert(res.body, schema);
+                done()
+            })
+            .catch(done)
+        })
+    })
+})

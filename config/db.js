@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+const logger = require('../logger');
 const config = require('./config');
 
 //production, development or test
@@ -11,7 +12,10 @@ const sequelize = new Sequelize(
     
     {
         host: config.database[mode].host,
-        dialect: config.database.dialect
+        dialect: config.database.dialect,
+
+        //show queries logs only in development
+        logging : msg => config.mode === 'development' ? logger.debug(msg) : null
     }
 );
 

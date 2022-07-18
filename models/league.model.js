@@ -1,6 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
-const GameWeek = require('./gameweek.model');
+const LeagueType = require('./league_types.model');
 const User = require('./user.model');
 
 class League extends Model {}
@@ -13,13 +13,15 @@ League.init(
         },
         invite_code: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         type: {
-            type: DataTypes.STRING,
-            allowNull: false
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            comment : 'general, public or private league.'
         },
-        max_participant: {
+        max_participants: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -30,6 +32,11 @@ League.init(
         starting_gameweek: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        is_closed : {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            comment : 'League is closed to new entries.'
         }
     },
     {
@@ -44,9 +51,8 @@ League.belongsTo(User, {
     as : 'administrator'
 });
 
-League.belongsTo(GameWeek, {
-    foreignKey : 'starting_gameweek',
-    as : 'startingGameweek'
+League.belongsTo(LeagueType, {
+    foreignKey : 'type'
 });
 
 module.exports = League;
