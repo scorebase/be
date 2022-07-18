@@ -65,10 +65,14 @@ User.init({
 }, {
     sequelize,
     modelName: 'User',
-    tableName: 'users'
+    tableName: 'users',
+    hooks : {
+        beforeCreate : User.hashPassword,
+        beforeUpdate : User.hashPassword
+    }
 });
 
-User.beforeCreate(User.hashPassword);
-User.beforeUpdate(User.hashPassword);
+// User.beforeCreate(User.hashPassword);
+// User.beforeUpdate(User.hashPassword);
 
 module.exports = User;
