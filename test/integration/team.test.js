@@ -18,8 +18,6 @@ chai.use(chaiHttp);
 describe('Teams Test /team', () => {
     before(async () => {
         await Team.sync({ force: true });
-        await User.sync({ force: true });
-        await User.create(users[0]);
         await Team.create(teams[0]);
       });
       
@@ -218,75 +216,75 @@ describe('Teams Test /team', () => {
           .catch(done)
         })
 
-        // it('It should return error, if a team with similar short name exists', (done) => {
-        //     const validToken = AuthService.generateToken({ id: 1 });
-        //     let team = { ...teams[0], short_name: teams[1].short_name };
+        it('It should return error, if a team with similar short name exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            let team = { ...teams[0], short_name: teams[1].short_name };
         
-        //     chai
-        //       .request(server)
-        //       .put('/team/1')
-        //       .set(TOKEN_HEADER, validToken)
-        //       .send(team)
-        //       .then((res) => {
-        //         expect(res).to.have.status(400);
+            chai
+              .request(server)
+              .put('/team/1')
+              .set(TOKEN_HEADER, validToken)
+              .send(team)
+              .then((res) => {
+                expect(res).to.have.status(400);
         
-        //         const schema = joi.object({
-        //           status: 'error',
-        //           message: joi.string().valid(teamErrors.TEAM_SHORTNAME_EXISTS),
-        //           data: null,
-        //         });
-        //         joi.assert(res.body, schema);
+                const schema = joi.object({
+                  status: 'error',
+                  message: joi.string().valid(teamErrors.TEAM_SHORTNAME_EXISTS),
+                  data: null,
+                });
+                joi.assert(res.body, schema);
         
-        //         done();
-        //       })
-        //       .catch(done);
-        //   });
+                done();
+              })
+              .catch(done);
+          });
         
-        //   it('It should return error, if a team with similar jersey exists', (done) => {
-        //     const validToken = AuthService.generateToken({ id: 1 });
-        //     let team = { ...teams[0], short_name: teams[3].short_name };
-        //     chai
-        //       .request(server)
-        //       .put('/team/1')
-        //       .set(TOKEN_HEADER, validToken)
-        //       .send(team)
-        //       .then((res) => {
-        //         expect(res).to.have.status(400);
+          it('It should return error, if a team with similar jersey exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            let team = { ...teams[0], jersey: teams[1].jersey };
+            chai
+              .request(server)
+              .put('/team/1')
+              .set(TOKEN_HEADER, validToken)
+              .send(team)
+              .then((res) => {
+                expect(res).to.have.status(400);
         
-        //         const schema = joi.object({
-        //           status: 'error',
-        //           message: joi.string().valid(teamErrors.TEAM_JERSEY_EXISTS),
-        //           data: null,
-        //         });
+                const schema = joi.object({
+                  status: 'error',
+                  message: joi.string().valid(teamErrors.TEAM_JERSEY_EXISTS),
+                  data: null,
+                });
         
-        //         joi.assert(res.body, schema);
+                joi.assert(res.body, schema);
         
-        //         done();
-        //       })
-        //       .catch(done);
-        //   });
+                done();
+              })
+              .catch(done);
+          });
         
-        //   it('It should return error, if team with similar name exists', (done) => {
-        //     const validToken = AuthService.generateToken({ id: 1 });
-        //     let team = { ...teams[0], name: teams[1].name };
+          it('It should return error, if team with similar name exists', (done) => {
+            const validToken = AuthService.generateToken({ id: 1 });
+            let team = { ...teams[0], name: teams[1].name };
         
-        //     chai
-        //       .request(server)
-        //       .post('/team')
-        //       .set(TOKEN_HEADER, validToken)
-        //       .send(team)
-        //       .then((res) => {
-        //         expect(res).to.have.status(400);
-        //         const schema = joi.object({
-        //           status: 'error',
-        //           message: joi.string().valid(teamErrors.TEAM_NAME_EXISTS),
-        //           data: null,
-        //         });
-        //         joi.assert(res.body, schema);
-        //         done();
-        //       })
-        //       .catch(done);
-        //   });
+            chai
+              .request(server)
+              .put('/team/1')
+              .set(TOKEN_HEADER, validToken)
+              .send(team)
+              .then((res) => {
+                expect(res).to.have.status(400);
+                const schema = joi.object({
+                  status: 'error',
+                  message: joi.string().valid(teamErrors.TEAM_NAME_EXISTS),
+                  data: null,
+                });
+                joi.assert(res.body, schema);
+                done();
+              })
+              .catch(done);
+          });
       })
       
       describe('DELETE /team/:teamId', () => {
