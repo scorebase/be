@@ -4,6 +4,7 @@ const chaiHttp = require('chai-http');
 const joi = require('joi');
 
 const server = require('../..');
+const sequelize = require('../../config/db');
 const { TOKEN_HEADER } = require('../../helpers/constants');
 const { fixtureErrors, teamErrors, gameweekErrors } = require('../../errors');
 const { fixtureMessages } = require('../../helpers/messages');
@@ -24,6 +25,7 @@ const gameweeks = require('../helpers/gamweeks.mock');
 chai.use(chaiHttp);
 
 before(async () => {
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true})
     await User.sync({ force: true });
     await Team.sync({ force: true });
     await Season.sync({ force: true });

@@ -56,9 +56,9 @@ class FixtureService {
     
         fixture.date_time = create_date_time;
     
-        const updatedFixture = await Fixture.update(fixture, {where: {id: fixture.id}});
+        await Fixture.update(fixture, {where: {id: fixture.id}});
     
-        return updatedFixture;
+        return fixture;
     }
 
     static async getFixtures(gameweek_id) {
