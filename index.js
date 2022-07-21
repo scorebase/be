@@ -1,5 +1,5 @@
 const express = require('express');
-
+const cors = require('cors');
 const config = require('./config/config');
 const logger = require('./logger');
 const sequelize = require('./config/db');
@@ -13,6 +13,8 @@ const gameweekRouter = require('./routes/gameweek.route');
 const leagueRouter = require('./routes/league.route');
 
 const server = express();
+
+server.use(cors());
 
 server.use(express.json());
 
