@@ -1,11 +1,13 @@
 const { NotFoundError, ServiceError } = require('../errors/http_errors');
-const { picksErrors, gameweekErrors } = require('../errors');
+const { picksErrors, gameweekErrors, userErrors } = require('../errors');
 const GameWeek = require('../models/gameweek.model');
 const Picks = require('../models/picks.model');
 const PickItem = require('../models/pickItem.model');
+const User = require('../models/user.model');
 const { Op } = require('sequelize');
 
 const {GAMEWEEK_NOT_FOUND} = gameweekErrors;
+const {USER_NOT_FOUND} = userErrors;
 const {
     MASTER_PICK_LESS_THAN_ONE,
     MASTER_PICK_GREATER_THAN_ONE,
@@ -75,6 +77,12 @@ class PicksService {
     }
 
     static async getPick(playerId, gameweekId) {
+        const userExists = await User.findByPk(playerId);
+        if(!userExists) throw new NotFoundError(USER_NOT_FOUND);
+
+        const gameweekExists = await GameWeek.findByPk(gameweekId);
+        if (!gameweekExists) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
+
         const picksData = await Picks.findOne({ where: {
             [Op.and] : [{player_id: playerId}, {gameweek_id: gameweekId}]
         }});
