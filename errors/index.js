@@ -13,15 +13,12 @@ module.exports = {
         USER_NOT_FOUND: 'User not found'
     },
     fixtureErrors: {
-        FIXTURE_NOT_FOUND: 'Fixture not found',
-        FIXTURES_NOT_FOUND: 'Fixtures not yet created'
+        FIXTURE_NOT_FOUND: 'Fixture not found'
     },
     gameweekErrors: {
         GAMEWEEK_NOT_FOUND: 'Gameweek not found'
     },
     teamErrors : {
-        HOME_TEAM_NOT_FOUND : 'Home team not found',
-        AWAY_TEAM_NOT_FOUND : 'Away team not found',
         UNIQUE_IDS: 'Home Team Id and Away Team Id must be different'
     },
     picksErrors : {

@@ -5,22 +5,13 @@ const { NotFoundError, ServiceError } = require('../errors/http_errors');
 const { fixtureErrors, gameweekErrors, teamErrors } = require('../errors');
 const { Op } = require('sequelize');
 
-const { FIXTURE_NOT_FOUND, FIXTURES_NOT_FOUND } = fixtureErrors;
+const { FIXTURE_NOT_FOUND } = fixtureErrors;
 const { GAMEWEEK_NOT_FOUND } = gameweekErrors;
-const { HOME_TEAM_NOT_FOUND, AWAY_TEAM_NOT_FOUND, UNIQUE_IDS } = teamErrors;
+const { UNIQUE_IDS } = teamErrors;
 
 class FixtureService {
     static async createFixture(home_team_id, away_team_id, date_time, gameweek_id) {
         if(home_team_id === away_team_id) throw new ServiceError(UNIQUE_IDS);
-
-        const homeTeamId = await Team.findByPk(home_team_id);
-        if(!homeTeamId) throw new NotFoundError(HOME_TEAM_NOT_FOUND);
-
-        const awayTeamId = await Team.findByPk(away_team_id);
-        if(!awayTeamId) throw new NotFoundError(AWAY_TEAM_NOT_FOUND);
-
-        const gameweekExists = await GameWeek.findByPk(gameweek_id);
-        if (!gameweekExists) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
 
         const create_date_time = new Date(date_time);
 
@@ -45,12 +36,6 @@ class FixtureService {
         if(!fixtureExists) throw new NotFoundError(FIXTURE_NOT_FOUND);
 
         if(fixture.home_team_id === fixture.away_team_id) throw new ServiceError(UNIQUE_IDS);
-    
-        const homeTeamId = await Team.findByPk(fixture.home_team_id);
-        if(!homeTeamId) throw new NotFoundError(HOME_TEAM_NOT_FOUND);
-    
-        const awayTeamId = await Team.findByPk(fixture.away_team_id);
-        if(!awayTeamId) throw new NotFoundError(AWAY_TEAM_NOT_FOUND);
     
         const create_date_time = new Date(fixture.date_time);
     
@@ -79,7 +64,6 @@ class FixtureService {
             }
             ]
         });
-        if (fixtures.length === 0) throw new NotFoundError(FIXTURES_NOT_FOUND);
 
         return fixtures;
     }
