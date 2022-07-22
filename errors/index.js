@@ -23,5 +23,11 @@ module.exports = {
         HOME_TEAM_NOT_FOUND : 'Home team not found',
         AWAY_TEAM_NOT_FOUND : 'Away team not found',
         UNIQUE_IDS: 'Home Team Id and Away Team Id must be different'
+    },
+    picksErrors : {
+        MASTER_PICK_LESS_THAN_ONE: 'Master pick cannot be less than 1',
+        MASTER_PICK_GREATER_THAN_ONE: 'Master pick cannot be greater than 1',
+        PICK_ALREADY_EXISTS: 'Pick already exists',
+        PICK_NOT_FOUND: 'Pick not found'
     }
 };
