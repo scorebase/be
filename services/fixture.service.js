@@ -55,12 +55,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey']
             }
             ]
         });
@@ -79,12 +79,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey']
             }
             ]
         });
@@ -108,12 +108,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey']
             }
             ]
         });

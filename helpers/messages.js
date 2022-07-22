@@ -5,7 +5,7 @@ module.exports = {
         PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.'
     },
     fixtureMessages : {
-        CREATION_SUCCESS: 'fixture created successfully',
+        FIXTURE_CREATED_SUCCESS: 'Fixture created successfully',
         FIXTURES_FOUND_SUCCESS: 'Fixtures gotten successfully',
         FIXTURE_DELETED_SUCCESS: 'Fixture deleted successfully',
         FIXTURE_UPDATE_SUCCESS: 'Fixture updated successfully'

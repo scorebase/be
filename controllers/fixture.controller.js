@@ -2,14 +2,18 @@ const { fixtureMessages } = require('../helpers/messages');
 const successResponse = require('../helpers/success_response');
 const FixtureService = require('../services/fixture.service');
 
-const { CREATION_SUCCESS, FIXTURES_FOUND_SUCCESS, FIXTURE_DELETED_SUCCESS, FIXTURE_UPDATE_SUCCESS } = fixtureMessages;
+const {
+    FIXTURE_CREATED_SUCCESS,
+    FIXTURES_FOUND_SUCCESS,
+    FIXTURE_DELETED_SUCCESS,
+    FIXTURE_UPDATE_SUCCESS } = fixtureMessages;
 
 const FixtureController = {
     async createFixture(req, res, next) {
         try {
             const { home_team_id, away_team_id, date_time, gameweek_id } = req.body;
             const data = await FixtureService.createFixture(home_team_id, away_team_id, date_time, gameweek_id);
-            return successResponse(res, CREATION_SUCCESS, data);
+            return successResponse(res, FIXTURE_CREATED_SUCCESS, data);
         } catch(error) {
             next(error);
         }
