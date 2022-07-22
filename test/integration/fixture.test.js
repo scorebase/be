@@ -234,7 +234,7 @@ describe('/GET /fixture/all/headtohead?teamOne={teamOneId}&teamTwo={teamTwoId}',
         let token = AuthService.generateToken({ id : 1 });
 
         chai.request(server)
-        .get('/fixture/all/headtohead?teamOne=1&teamTwo=2')
+        .get('/fixture/all/headtohead?teamOne=1&teamTwo=4')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(200);
@@ -255,12 +255,12 @@ describe('/GET /fixture/all/headtohead?teamOne={teamOneId}&teamTwo={teamTwoId}',
                     home_team: joi.object({
                         name: joi.string().valid(),
                         short_name: joi.string().valid(),
-                        jersery: joi.string().valid()
+                        jersey: joi.string().valid()
                     }),
                     away_team: joi.object({
                         name: joi.string().valid(),
                         short_name: joi.string().valid(),
-                        jersery: joi.string().valid()
+                        jersey: joi.string().valid()
                     })
                 })
             })
@@ -277,7 +277,7 @@ describe('/GET /fixture/all/recent/:teamId?last={last}', () => {
         let token = AuthService.generateToken({ id : 1 });
 
         chai.request(server)
-        .get('/fixture/all/recent/:teamId?last=5')
+        .get('/fixture/all/recent/1?last=5')
         .set(TOKEN_HEADER, token)
         .then(res => {
             expect(res).to.have.status(200);
@@ -298,15 +298,16 @@ describe('/GET /fixture/all/recent/:teamId?last={last}', () => {
                     home_team: joi.object({
                         name: joi.string().valid(),
                         short_name: joi.string().valid(),
-                        jersery: joi.string().valid()
+                        jersey: joi.string().valid()
                     }),
                     away_team: joi.object({
                         name: joi.string().valid(),
                         short_name: joi.string().valid(),
-                        jersery: joi.string().valid()
+                        jersey: joi.string().valid()
                     })
                 })
             })
+            console.log(res.body);
             joi.assert(res.body, schema)
             done();
         })
