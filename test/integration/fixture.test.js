@@ -14,9 +14,7 @@ const Fixture = require('../../models/fixture.model');
 const Team = require('../../models/team.model');
 const GameWeek = require('../../models/gameweek.model');
 const Season = require('../../models/season.model');
-const User = require('../../models/user.model');
 
-const users = require('../helpers/users.mock');
 const fixtures = require('../helpers/fixtures.mock');
 const teams = require('../helpers/teams.mock');
 const seasons = require('../helpers/seasons.mock')
@@ -25,13 +23,8 @@ const gameweeks = require('../helpers/gamweeks.mock');
 chai.use(chaiHttp);
 
 before(async () => {
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true})
-    await User.sync({ force: true });
-    await Team.sync({ force: true });
-    await Season.sync({ force: true });
-    await GameWeek.sync({ force: true });
-    await Fixture.sync({ force: true });
-    await User.create(users[0]);
+    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true});
+    await sequelize.sync({ force : true });
     await Team.create(teams[0]);
     await Team.create(teams[1]);
     await Team.create(teams[2]);
@@ -272,7 +265,7 @@ describe('/GET /fixture/all/headtohead?teamOne={teamOneId}&teamTwo={teamTwoId}',
 });
 
 describe('/GET /fixture/all/recent/:teamId?last={last}', () => {
-    it('It should successfully get last 10 head to head fixtures between the two teams', 
+    it('It should successfully get last {last} fixtures of a tem', 
     (done) => {
         let token = AuthService.generateToken({ id : 1 });
 

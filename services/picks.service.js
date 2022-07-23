@@ -37,14 +37,14 @@ class PicksService {
         const picksData = await Picks.create({ player_id, gameweek_id, total_points });
 
         pick_items.forEach(item => item.picks_id = picksData.id);
-        await PickItem.bulkCreate(pick_items);
+        const pickItemsData = await PickItem.bulkCreate(pick_items);
 
-        return pick;
+        return { ...picksData.dataValues, pick_items: pickItemsData};
     }
 
     static async updatePick(pick, pickId) {
         const pickExists = await Picks.findByPk(pickId);
-        if(!pickExists) throw new ServiceError(PICK_NOT_FOUND);
+        if(!pickExists) throw new NotFoundError(PICK_NOT_FOUND);
 
         let count = 0;
         for(let i = 0; i < pick.pick_items.length; i++) {
@@ -67,7 +67,7 @@ class PicksService {
 
     static async deletePick(pickId) {
         const pickExists = await Picks.findByPk(pickId);
-        if(!pickExists) throw new ServiceError(PICK_NOT_FOUND);
+        if(!pickExists) throw new NotFoundError(PICK_NOT_FOUND);
 
         await PickItem.destroy({ where: {picks_id: pickId} });
         await Picks.destroy({ where: { id : pickId }});
@@ -88,8 +88,8 @@ class PicksService {
         }});
         const pickItemsData = await PickItem.findAll({where: {picks_id: picksData.id}});
 
-        const updatedPicksData = { ...picksData.dataValues, pick_items: pickItemsData };
-        return updatedPicksData;
+        const returnedPicksData = { ...picksData.dataValues, pick_items: pickItemsData };
+        return returnedPicksData;
     }
 }
 
