@@ -1,0 +1,99 @@
+const { NotFoundError, ServiceError } = require('../errors/http_errors');
+const { picksErrors, gameweekErrors } = require('../errors');
+const GameWeek = require('../models/gameweek.model');
+const Picks = require('../models/picks.model');
+const PickItem = require('../models/pickItem.model');
+const { Op } = require('sequelize');
+
+const {GAMEWEEK_NOT_FOUND} = gameweekErrors;
+const {
+    MASTER_PICK_LESS_THAN_ONE,
+    MASTER_PICK_GREATER_THAN_ONE,
+    PICK_ALREADY_EXISTS,
+    PICK_NOT_FOUND,
+    PICK_ACCESS_DENIED} = picksErrors;
+
+class PicksService {
+    static async createPick(pick, player_id, gameweekId) {
+        const gameweekExists = await GameWeek.findByPk(gameweekId);
+        if(!gameweekExists) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
+
+        this.deadlinePassed(gameweekExists.deadline);
+
+        const gameweekPickExists = await Picks.findOne({where: {gameweek_id: gameweekId}});
+        if(gameweekPickExists) throw new ServiceError(PICK_ALREADY_EXISTS);
+
+        const { pick_items } = pick;
+
+        let count = 0;
+        for(let i = 0; i < pick_items.length; i++) {
+            if(pick_items[i].is_master_pick === true) count++;
+            if(count > 1) break;
+        }
+
+        if(count < 1) throw new ServiceError(MASTER_PICK_LESS_THAN_ONE);
+        if(count > 1) throw new ServiceError(MASTER_PICK_GREATER_THAN_ONE);
+
+        const gameweek_id = gameweekId;
+        const picksData = await Picks.create({ player_id, gameweek_id });
+
+        pick_items.forEach(item => item.picks_id = picksData.id);
+        const pickItemsData = await PickItem.bulkCreate(pick_items);
+
+        return { ...picksData.dataValues, pick_items: pickItemsData};
+    }
+
+    static async updatePick(pick, player_id, pickId) {
+        const pickExists = await Picks.findOne({
+            where: {player_id, id: pickId},
+            include: {
+                model: GameWeek,
+                attributes: ['deadline']
+            }
+        });
+        if(!pickExists) throw new NotFoundError(PICK_NOT_FOUND);
+
+        this.deadlinePassed(pickExists.GameWeek.deadline);
+
+        let count = 0;
+        for(let i = 0; i < pick.pick_items.length; i++) {
+            if(pick.pick_items[i].is_master_pick === true) count++;
+            if(count > 1) break;
+        }
+
+        if(count < 1) throw new ServiceError(MASTER_PICK_LESS_THAN_ONE);
+        if(count > 1) throw new ServiceError(MASTER_PICK_GREATER_THAN_ONE);
+
+        await Picks.update(pick, {where: {id: pickId}});
+        pick.pick_items.forEach(item => {
+            PickItem.update(item, {where: {
+                [Op.and] : [{picks_id : pickId}, {fixture_id: item.fixture_id}]
+            }});
+        });
+
+        return pick;
+    }
+
+    static async getPick(playerId, userId, gameweekId) {
+        const gameweekExists = await GameWeek.findByPk(gameweekId);
+        if (!gameweekExists) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
+
+        if((+playerId !== userId) && new Date().getTime() <= new Date(gameweekExists.deadline).getTime()
+        ) throw new ServiceError(PICK_ACCESS_DENIED);
+            
+        const picksData = await Picks.findOne({ where: {
+            [Op.and] : [{player_id: playerId}, {gameweek_id: gameweekId}]
+        }});
+        const pickItemsData = await PickItem.findAll({where: {picks_id: picksData.id}});
+
+        const returnedPicksData = { ...picksData.dataValues, pick_items: pickItemsData };
+        return returnedPicksData;
+    }
+
+    static async deadlinePassed(deadline){
+        if(new Date().getTime() >= new Date(deadline).getTime())
+            throw new ServiceError(PICK_ACCESS_DENIED);
+    }
+}
+
+module.exports = PicksService;

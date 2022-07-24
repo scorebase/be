@@ -7,6 +7,8 @@ const sequelize = require('./config/db');
 ///routes
 const authRouter = require('./routes/auth.route');
 const userRouter = require('./routes/user.route');
+const fixtureRouter = require('./routes/fixture.route');
+const picksRouter = require('./routes/picks.route');
 const teamRouter = require('./routes/team.route');
 const seasonRouter = require('./routes/season.route');
 const gameweekRouter = require('./routes/gameweek.route');
@@ -30,6 +32,8 @@ server.get('/', (req, res) => {
 
 server.use('/auth', authRouter);
 server.use('/user', userRouter);
+server.use('/fixture', fixtureRouter);
+server.use('/picks', picksRouter);
 server.use('/team', teamRouter);
 server.use('/season', seasonRouter);
 server.use('/gameweek', gameweekRouter);

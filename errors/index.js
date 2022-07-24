@@ -1,4 +1,14 @@
 module.exports = {
+    fixtureErrors: {
+        FIXTURE_NOT_FOUND: 'Fixture not found'
+    },
+    picksErrors : {
+        MASTER_PICK_LESS_THAN_ONE: 'Master pick cannot be less than 1',
+        MASTER_PICK_GREATER_THAN_ONE: 'Master pick cannot be greater than 1',
+        PICK_ALREADY_EXISTS: 'Pick already exists',
+        PICK_NOT_FOUND: 'Pick not found',
+        PICK_ACCESS_DENIED: 'Pick Access Denied'
+    },
     authErrors : {
         INVALID_CREDENTIALS_ERROR :'Invalid credentials.',
         USERNAME_EXISTS_ERROR :'An account already exists with that username. Please choose another.',
@@ -15,7 +25,8 @@ module.exports = {
         TEAM_NAME_EXISTS: 'A team with similar name already exist. Please choose another one.',
         TEAM_SHORTNAME_EXISTS: 'A team with similar short name already exist. Please choose another one.',
         TEAM_JERSEY_EXISTS: 'A team with similar jersey already exist. Please choose another one.',
-        TEAM_NOT_FOUND: 'Team not found'
+        TEAM_NOT_FOUND: 'Team not found',
+        UNIQUE_IDS: 'Home Team Id and Away Team Id must be different'
     },
     seasonErrors: {
         SEASON_NAME_EXISTS: 'There is a season with similar name. Please choose another one.',
