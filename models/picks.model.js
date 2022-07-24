@@ -17,7 +17,6 @@ Picks.init(
         },
         total_points: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             defaultValue: 0
         }
     },

@@ -13,7 +13,6 @@ module.exports = {
     picksMessages : {
         PICK_CREATE_SUCCESS: 'Pick created successfully',
         PICK_UPDATE_SUCCESS: 'Pick updated successfully',
-        PICK_DELETED_SUCCESS: 'Pick deleted successfully',
         PICK_FOUND_SUCCESS: 'Pick gotten successfully'
     }
 };

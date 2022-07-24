@@ -25,6 +25,7 @@ module.exports = {
         MASTER_PICK_LESS_THAN_ONE: 'Master pick cannot be less than 1',
         MASTER_PICK_GREATER_THAN_ONE: 'Master pick cannot be greater than 1',
         PICK_ALREADY_EXISTS: 'Pick already exists',
-        PICK_NOT_FOUND: 'Pick not found'
+        PICK_NOT_FOUND: 'Pick not found',
+        PICK_ACCESS_DENIED: 'Pick Access Denied'
     }
 };
