@@ -19,6 +19,16 @@ class UserService {
         return data;
     }
 
+    static async loadByUserName(username) {
+        const user = await User.findOne({ where : { username } });
+        if(!user) throw new NotFoundError(USER_NOT_FOUND);
+
+        //delete password_hash from response
+        user.password = undefined;
+        
+        return user;
+    }
+
 };
 
 module.exports = UserService;

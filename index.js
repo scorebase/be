@@ -1,5 +1,5 @@
 const express = require('express');
-
+const cors = require('cors');
 const config = require('./config/config');
 const logger = require('./logger');
 const sequelize = require('./config/db');
@@ -9,8 +9,14 @@ const authRouter = require('./routes/auth.route');
 const userRouter = require('./routes/user.route');
 const fixtureRouter = require('./routes/fixture.route');
 const picksRouter = require('./routes/picks.route');
+const teamRouter = require('./routes/team.route');
+const seasonRouter = require('./routes/season.route');
+const gameweekRouter = require('./routes/gameweek.route');
+const leagueRouter = require('./routes/league.route');
 
 const server = express();
+
+server.use(cors());
 
 server.use(express.json());
 
@@ -28,6 +34,10 @@ server.use('/auth', authRouter);
 server.use('/user', userRouter);
 server.use('/fixture', fixtureRouter);
 server.use('/picks', picksRouter);
+server.use('/team', teamRouter);
+server.use('/season', seasonRouter);
+server.use('/gameweek', gameweekRouter);
+server.use('/league', leagueRouter);
 
 //Handle all errors
 /* eslint-disable */
@@ -39,16 +49,16 @@ server.use((error, req, res, next) => {
   }
   return res
     .status(error.statusCode || 500)
-    .json({ status: "error", message: error.message, data: null });
+    .json({ status: 'error', message: error.message, data: null });
 });
 
 server.listen(config.port, async () => {
   try {
     await sequelize.authenticate();
-    logger.info("Connection has been established successfully.");
-    logger.info("Server running on PORT " + config.port);
+    logger.info('Connection has been established successfully.');
+    logger.info('Server running on PORT ' + config.port);
   } catch (error) {
-    logger.error("Unable to connect to the database:", error);
+    logger.error('Unable to connect to the database:', error);
   }
 });
 

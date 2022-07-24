@@ -1,24 +1,29 @@
 const teams = [
     {
-        "name" : "Arsenal",
-        "short_name" : "ARS",
-        "jersey": "arsenal.png"
+        "name": "Liverpool",
+        "short_name": "LIV",
+        "jersey": "https://liverpool.com/jersey-image"
     },
     {
-        "name" : "Chelsea",
-        "short_name" : "CHE",
-        "jersey": "chelsea.png"
+        "name": "Everton",
+        "short_name": "EVE",
+        "jersey": "https://everton.com/jersey-image"
     },
     {
-        "name" : "Tottenham",
-        "short_name" : "TOT",
-        "jersey": "tottenham.png"
+        "name": "Chelsea",
+        "short_name": "CHE",
+        "jersey": "https://chelsea.com/jersey-image"
     },
     {
-        "name" : "Macnhester United",
-        "short_name" : "MNU",
-        "jersey": "manchester_united.png"
+        "name": "Watford",
+        "short_name": "WAT",
+        "jersey": "https://watford.com/jersey-image"
+    },
+    {
+        "name": "Leeds",
+        "short_name": "LEE",
+        "jersey": "https://leeds.com/jersey-image"
     }
-]
+];
 
-module.exports = teams;
+module.exports = teams

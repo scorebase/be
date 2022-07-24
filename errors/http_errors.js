@@ -31,4 +31,14 @@ class UnauthorizedError extends Error {
     }
 }
 
-module.exports = { NotFoundError,  ServiceError, UnauthorizedError };
+class ForbiddenError extends Error {
+    /**
+     *
+     * @param {string} message Error message
+     */
+    constructor(message) {
+        super(message);
+        this.statusCode = 403;
+    }
+}
+module.exports = { NotFoundError,  ServiceError, UnauthorizedError, ForbiddenError };
