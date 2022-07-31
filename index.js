@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const config = require('./config/config');
 const logger = require('./logger');
+const Sequelize = require('sequelize');
 const sequelize = require('./config/db');
 
 ///routes
@@ -46,6 +47,14 @@ server.use((error, req, res, next) => {
     // joi error
     error.statusCode = 422;
     error.message = error.error.message;
+  } else if(error instanceof Sequelize.BaseError) {
+    //dont show sequelize error to users, log the error for debugging purpose
+    logger.error(`
+      Seqelize error occured on url ${req.originalUrl}
+      with request body : ${JSON.stringify(req.body) || null}
+      with error ${error.message}
+    `);
+    error.message = 'Unknown error occured.'
   }
   return res
     .status(error.statusCode || 500)
