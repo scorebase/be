@@ -27,7 +27,8 @@ const config = {
         }
     },
     auth : {
-        secret : process.env.JWT_SECRET
+        secret : process.env.JWT_SECRET,
+        adminSecret : process.env.ADMIN_SECRET
     }
 };
 

@@ -16,7 +16,8 @@ module.exports = {
         ACCOUNT_NOT_FOUND : 'Account not found.',
         INCORRECT_PASSWORD : 'Incorrect password.',
         TOKEN_REQUIRED : 'You need to be logged in to access this functionality.',
-        INVALID_SESSION : 'Invalid session.'
+        INVALID_SESSION : 'Invalid session.',
+        NOT_PERMITTED : 'You do not have the rights to do perform this action.'
     },
     userErrors : {
         USER_NOT_FOUND : 'User not found'
