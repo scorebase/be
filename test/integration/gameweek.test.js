@@ -15,6 +15,7 @@ const {
     gameweekErrors
 } = require('../../errors/index');
 const gameweeks = require('../helpers/gameweek.mock');
+const GameWeekState = require('../../models/gameweek_state.model');
 
 const {
     GAMEWEEK_CREATED_SUCCESS,
@@ -269,6 +270,12 @@ describe('Gameweek Test  /gameweek', () => {
     })
 
     describe('GET /state', () => {
+        before(async () => {
+            await GameWeekState.bulkCreate([
+                { state : 'current', id : 1},
+                { state : 'next', id : null }
+            ]);
+        })
         it('should fetch gameweek state successfully', (done) => {
             const validToken = AuthService.generateToken({ id: 1 });
             chai
@@ -281,8 +288,16 @@ describe('Gameweek Test  /gameweek', () => {
                         status: 'success',
                         message: joi.string().valid(GAMEWEEK_STATUS_GET_SUCCESS),
                         data: joi.object({
-                            current : joi.valid(joi.number, null),
-                            next : joi.valid(joi.number, null).required()
+                            current : joi.object({
+                                id : joi.number().integer().positive().required(),
+                                title : joi.string().required(),
+                                deadline : joi.date().required()
+                            }).allow(null).required(),
+                            next : joi.object({
+                                id : joi.number().integer().positive().required(),
+                                title : joi.string().required(),
+                                deadline : joi.date().required()
+                            }).allow(null).required()
                         }),
                     });
                     joi.assert(res.body, schema);

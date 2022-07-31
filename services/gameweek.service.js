@@ -124,11 +124,17 @@ class GameweekService {
      * @returns {array} the game states
      */
     static async getGameweekState() {
-        const states = await GameWeekState.findAll();
+        const states = await GameWeekState.findAll({
+            include : {
+                model : Gameweek,
+                as : 'gameweek',
+                attributes : ['id', 'deadline', 'title']
+            }
+        });
 
         const data = { current : null, next : null };
         states.forEach(s => {
-            data[s.state] = s.id;
+            data[s.state] = s.gameweek;
         });
 
         return data;
