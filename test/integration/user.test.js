@@ -1,15 +1,12 @@
 const { expect } = require('chai');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const joi = require('joi');
 
 const server = require('../..');
 const { TOKEN_HEADER } = require('../../helpers/constants');
-const User = require('../../models/user.model');
 const AuthService = require('../../services/auth.service');
 const users = require('../helpers/users.mock');
 
-chai.use(chaiHttp);
 
 describe('USER TESTS', () => {
     describe('GET /user/profile', () => {

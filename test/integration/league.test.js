@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const joi = require('joi');
 const { TOKEN_HEADER, LEAGUE_TYPES } = require('../../helpers/constants');
 const AuthService = require('../../services/auth.service');
@@ -12,8 +11,6 @@ const LeagueService = require('../../services/league.service');
 const League = require('../../models/league.model');
 const LeagueMember = require('../../models/league_member.model');
 const users = require('../helpers/users.mock');
-
-chai.use(chaiHttp);
 
 describe('LEAGUE TESTS', () => {
     describe('POST /league', () => {

@@ -1,13 +1,9 @@
 const { expect } = require('chai');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 
 const AuthService = require('../../services/auth.service');
 const joi = require('joi');
-const User = require('../../models/user.model');
-const Season = require('../../models/season.model');
 const server = require('../../index');
-const users = require('../helpers/users.mock');
 const { TOKEN_HEADER } = require('../../helpers/constants');
 const seasons = require('../helpers/season.mock');
 const { seasonErrors } = require('../../errors/index');
@@ -22,14 +18,7 @@ const {
 
 const { SEASON_NAME_EXISTS, SEASON_NOT_FOUND } = seasonErrors;
 
-chai.use(chaiHttp);
-
 describe(' Season Test /season', () => {
-    before(async () => {
-        await Season.sync({ force: true });
-        await Season.create(seasons[0]);
-    });
-
     describe('POST /season', () => {
         it('It should return success if all fields are valid', (done) => {
             const validToken = AuthService.generateToken({ id: 1 });
