@@ -22,7 +22,8 @@ const {
     GAMEWEEK_UPDATED_SUCCESS,
     GAMEWEEK_DELETED_SUCCESS,
     GAMEWEEK_STATUS_GET_SUCCESS,
-    GAMEWEEK_STATUS_UPDATED_SUCCESS
+    GAMEWEEK_STATUS_UPDATED_SUCCESS,
+    GAMEWEEKS_LOAD_SUCCESS
 } = gameweekMessages;
 
 const {
@@ -323,6 +324,28 @@ describe('Gameweek Test  /gameweek', () => {
                         status: 'error',
                         message: joi.string().required(),
                         data : null
+                    });
+                    joi.assert(res.body, schema);
+                    done();
+                })
+                .catch(done);
+        })
+    })
+
+    describe('GET /gameweek/all', () => {
+        it('should get all gameweeks successfully', (done) => {
+            chai
+                .request(server)
+                .get('/gameweek/all')
+                .then((res) => {
+                    expect(res).to.have.status(200);
+                    const schema = joi.object({
+                        status: 'success',
+                        message: joi.string().valid(GAMEWEEKS_LOAD_SUCCESS),
+                        data : joi.array().items({
+                            id : joi.number().integer().positive().required(),
+                            title : joi.string().required()
+                        })
                     });
                     joi.assert(res.body, schema);
                     done();

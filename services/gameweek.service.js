@@ -110,6 +110,16 @@ class GameweekService {
     }
 
     /**
+     * Fetch all gameweeks
+     * @returns array of all gameweeks
+     */
+    static async getAllGameweeks() {
+        const gameweeks = await Gameweek.findAll({ attributes : ['id', 'title']});
+
+        return gameweeks;
+    }
+
+    /**
      * Fetches the state of the game i.e current gameweek and next gameweek
      * @returns {array} the game states
      */

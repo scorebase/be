@@ -11,7 +11,8 @@ const {
     editGameweek,
     deleteAGameweek,
     getGameweekState,
-    updateGameweekState
+    updateGameweekState,
+    getAllGameweeks
 } = gameweekController;
 
 const gameweekRouter = express.Router();
@@ -19,6 +20,7 @@ const gameweekRouter = express.Router();
 gameweekRouter.post('/', validateBody(createGameweekSchema), isLoggedIn, isAdmin, createAGameweek);
 gameweekRouter.get('/state', getGameweekState);
 gameweekRouter.put('/state', validateBody(updateGameweekStatusSchema), isLoggedIn, isAdmin, updateGameweekState);
+gameweekRouter.get('/all', getAllGameweeks);
 gameweekRouter.get('/:gameweekId', isLoggedIn, getGameweek);
 gameweekRouter.put('/:gameweekId', validateBody(updateGameweekSchema), isLoggedIn, isAdmin, editGameweek);
 gameweekRouter.delete('/:gameweekId', isLoggedIn, isAdmin, deleteAGameweek);

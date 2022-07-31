@@ -7,7 +7,8 @@ const {
     GAMEWEEK_LOADED_SUCCESS,
     GAMEWEEK_UPDATED_SUCCESS,
     GAMEWEEK_STATUS_GET_SUCCESS,
-    GAMEWEEK_STATUS_UPDATED_SUCCESS
+    GAMEWEEK_STATUS_UPDATED_SUCCESS,
+    GAMEWEEKS_LOAD_SUCCESS
 } = gameweekMessages;
 
 const gameweekController = {
@@ -72,6 +73,16 @@ const gameweekController = {
             if(current === 0) current = null;
             const data = await GameweekService.updateGameweekState(current, next);
             return successResponse(res, GAMEWEEK_STATUS_UPDATED_SUCCESS , data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async getAllGameweeks(req, res, next) {
+        try {
+            const data = await GameweekService.getAllGameweeks();
+
+            return successResponse(res, GAMEWEEKS_LOAD_SUCCESS ,data);
         } catch (error) {
             next(error);
         }
