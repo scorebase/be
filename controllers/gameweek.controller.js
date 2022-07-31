@@ -5,7 +5,9 @@ const {
     GAMEWEEK_CREATED_SUCCESS,
     GAMEWEEK_DELETED_SUCCESS,
     GAMEWEEK_LOADED_SUCCESS,
-    GAMEWEEK_UPDATED_SUCCESS
+    GAMEWEEK_UPDATED_SUCCESS,
+    GAMEWEEK_STATUS_GET_SUCCESS,
+    GAMEWEEK_STATUS_UPDATED_SUCCESS
 } = gameweekMessages;
 
 const gameweekController = {
@@ -49,6 +51,27 @@ const gameweekController = {
             const data = await GameweekService.deleteGameweek(gameweekId);
 
             return successResponse(res, GAMEWEEK_DELETED_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+    async getGameweekState(req, res, next) {
+        try {
+            const data = await GameweekService.getGameweekState();
+            return successResponse(res, GAMEWEEK_STATUS_GET_SUCCESS , data);
+            
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async updateGameweekState(req, res, next) {
+        try {
+            let { next, current } = req.body;
+            if(next === 0) next = null;
+            if(current === 0) current = null;
+            const data = await GameweekService.updateGameweekState(current, next);
+            return successResponse(res, GAMEWEEK_STATUS_UPDATED_SUCCESS , data);
         } catch (error) {
             next(error);
         }

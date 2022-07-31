@@ -31,7 +31,9 @@ module.exports = {
         GAMEWEEK_CREATED_SUCCESS: 'This gameweek has been created successfully.',
         GAMEWEEK_UPDATED_SUCCESS: 'This gameweek has been updated successfully.',
         GAMEWEEK_LOADED_SUCCESS: 'This gameweek has been loaded successfully.',
-        GAMEWEEK_DELETED_SUCCESS: 'This gameweek has been deleted successfully.'
+        GAMEWEEK_DELETED_SUCCESS: 'This gameweek has been deleted successfully.',
+        GAMEWEEK_STATUS_UPDATED_SUCCESS : 'Gameweek status updated successfully.',
+        GAMEWEEK_STATUS_GET_SUCCESS : 'Gameweek status loaded successfully.'
     },
     leagueMessages : {
         LEAGUE_CREATION_SUCCESS : 'League created successfully.',

@@ -8,6 +8,10 @@ const gameweekValidator = {
     updateGameweekSchema: joi.object({
         deadline : joi.date().required(),
         title: joi.string().required()
+    }),
+    updateGameweekStatusSchema : joi.object({
+        current : joi.number().integer().required(),
+        next : joi.number().integer().invalid(joi.ref('current')).required()
     })
 };
 

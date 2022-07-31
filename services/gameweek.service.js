@@ -1,7 +1,11 @@
 const { Op } = require('sequelize');
 const Gameweek = require('../models/gameweek.model');
+
 const { ServiceError, NotFoundError } = require('../errors/http_errors');
 const { gameweekErrors } = require('../errors/index');
+const GameWeekState = require('../models/gameweek_state.model');
+const sequelize = require('../config/db');
+
 const {
     GAMEWEEK_NOT_FOUND,
     GAMEWEEK_TITLE_EXISTS,
@@ -103,6 +107,49 @@ class GameweekService {
         await Gameweek.destroy({ where: { id: gameweekId }});
 
         return null;
+    }
+
+    /**
+     * Fetches the state of the game i.e current gameweek and next gameweek
+     * @returns {array} the game states
+     */
+    static async getGameweekState() {
+        const states = await GameWeekState.findAll();
+
+        const data = { current : null, next : null };
+        states.forEach(s => {
+            data[s.state] = s.id;
+        });
+
+        return data;
+    }
+
+    /**
+     * updates the state of the game i.e current gameweek and next gameweek
+     * @param {int|null} currentGw The current gameweek
+     * @param {int|null} nextGw The next gameweek
+     * @returns {void}
+     */
+    static async updateGameweekState(currentGw, nextGw) {
+        const t = await sequelize.transaction();
+
+        try {
+            await GameWeekState.destroy({ where : {}, transaction : t });
+
+            await GameWeekState.bulkCreate([
+                { state : 'current', id : currentGw},
+                { state : 'next', id : nextGw }
+            ], {
+                transaction : t
+            });
+
+            await t.commit();
+
+            return;
+        } catch(error) {
+            await t.rollback();
+            throw error;
+        }
     }
 };
 
