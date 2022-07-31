@@ -11,8 +11,8 @@ const {
 const gameweekController = {
     async createAGameweek(req, res, next){
         try {
-            const { title, deadline, seasonId } = req.body;
-            const data = await GameweekService.createGameweek(deadline, title, seasonId);
+            const { title, deadline } = req.body;
+            const data = await GameweekService.createGameweek(deadline, title);
 
             return successResponse(res, GAMEWEEK_CREATED_SUCCESS, data);
         } catch (error) {
@@ -34,8 +34,8 @@ const gameweekController = {
     async editGameweek(req, res, next) {
         try {
             const gameweekId = req.params.gameweekId;
-            const { deadline, title, seasonId } = req.body;
-            const data = await GameweekService.updateGameweek(gameweekId, deadline, title, seasonId);
+            const { deadline, title } = req.body;
+            const data = await GameweekService.updateGameweek(gameweekId, deadline, title);
 
             return successResponse(res, GAMEWEEK_UPDATED_SUCCESS, data);
         } catch (error) {

@@ -12,8 +12,9 @@ Season.init(
     },
     {
         sequelize,
+        timestamps : false,
         modelName: 'Season',
-        tableName: 'season'
+        tableName: 'seasons'
     }
 );
 
