@@ -19,7 +19,8 @@ module.exports = {
         TEAM_CREATED_SUCCESS: 'Team created successfully.',
         TEAM_UPDATED_SUCCESS: 'Team updated successfully.',
         TEAM_DELETED_SUCCESS: 'Team deleted successfully',
-        TEAM_FOUND_SUCCESS: 'Team found successfully'
+        TEAM_FOUND_SUCCESS: 'Team found successfully',
+        TEAM_LIST_LOADED : 'Teams loaded.'
     },
     seasonMessages: {
         SEASON_CREATED_SUCCESS: 'This season has been created successfully.',

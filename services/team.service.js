@@ -120,6 +120,16 @@ class teamService {
         return null;
     }
 
+    static async getAllTeams() {
+        const teams = await Team.findAll({
+            attributes : {
+                exclude : ['createdAt', 'updatedAt']
+            }
+        });
+
+        return teams;
+    }
+
 }
 
 module.exports = teamService;

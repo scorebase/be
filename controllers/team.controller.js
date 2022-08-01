@@ -6,7 +6,8 @@ const {
     TEAM_CREATED_SUCCESS,
     TEAM_FOUND_SUCCESS,
     TEAM_UPDATED_SUCCESS,
-    TEAM_DELETED_SUCCESS
+    TEAM_DELETED_SUCCESS,
+    TEAM_LIST_LOADED
 } = teamMessages;
 
 const teamController = {
@@ -47,6 +48,15 @@ const teamController = {
             const teamId = req.params.teamId;
             const data = await teamService.deleteATeam(teamId);
             return successResponse(res, TEAM_DELETED_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async getAllTeams(req, res, next) {
+        try {
+            const data = await teamService.getAllTeams();
+            return successResponse(res, TEAM_LIST_LOADED, data);
         } catch (error) {
             next(error);
         }

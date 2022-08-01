@@ -5,11 +5,8 @@ const { TOKEN_HEADER } = require('../../helpers/constants');
 const server = require('../../index');
 const { teamMessages } = require('../../helpers/messages');
 const { teamErrors } = require('../../errors/index');
-const Team = require('../../models/team.model');
 
 const teams = require('../helpers/teams.mock');
-const users = require('../helpers/users.mock');
-const User = require('../../models/user.model');
 const AuthService = require('../../services/auth.service');
 
 
@@ -318,5 +315,29 @@ describe('Teams Test /team', () => {
             })
             .catch(done)
           })
+      })
+
+      describe('GET /team/all', () => {
+        it('should get all teams successfully', (done) => {
+          chai
+              .request(server)
+              .get('/team/all')
+              .then((res) => {
+                  expect(res).to.have.status(200);
+                  const schema = joi.object({
+                      status: 'success',
+                      message: joi.string().valid(teamMessages.TEAM_LIST_LOADED),
+                      data : joi.array().items({
+                          id : joi.number().integer().positive().required(),
+                          name : joi.string().required(),
+                          short_name : joi.string().required(),
+                          jersey : joi.string().required()
+                      })
+                  });
+                  joi.assert(res.body, schema);
+                  done();
+              })
+              .catch(done);
+        })
       })
 });
