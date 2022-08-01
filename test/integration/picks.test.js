@@ -12,13 +12,13 @@ const picks = require('../helpers/picks.mock');
 
 
 describe('Picks Tests', () => {
-    describe('POST /picks/:gameweekId', () => {
+    describe('POST /picks', () => {
         it('It should return 400 with response Master pick cannot be less than one', 
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .post('/picks/1')
+            .post('/picks')
             .set(TOKEN_HEADER, token)
             .send(picks[1])
             .then(res => {
@@ -39,7 +39,7 @@ describe('Picks Tests', () => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .post('/picks/1')
+            .post('/picks')
             .set(TOKEN_HEADER, token)
             .send(picks[2])
             .then(res => {
@@ -60,9 +60,9 @@ describe('Picks Tests', () => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .post('/picks/1')
+            .post('/picks')
             .set(TOKEN_HEADER, token)
-            .send(picks[0])
+            .send(picks[6])
             .then(res => {
                 expect(res).to.have.status(200);
                 const schema = joi.object({
@@ -94,31 +94,11 @@ describe('Picks Tests', () => {
             .catch(done);
         });
     
-        it('It should return 404 with response gameweek not found', (done) => {
-            let token = AuthService.generateToken({ id : 1 });
-    
-            chai.request(server)
-            .post('/picks/1000000')
-            .set(TOKEN_HEADER, token)
-            .send(picks[0])
-            .then(res => {
-                expect(res).to.have.status(404);
-                const schema = joi.object({
-                    status: 'error',
-                    message: joi.string().valid(gameweekErrors.GAMEWEEK_NOT_FOUND),
-                    data: null
-                });
-                joi.assert(res.body, schema);
-                done();
-            })
-            .catch(done);
-        });
-    
         it('It should return 400 with response pick already exists', (done) => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .post('/picks/1')
+            .post('/picks')
             .set(TOKEN_HEADER, token)
             .send(picks[0])
             .then(res => {
@@ -135,12 +115,12 @@ describe('Picks Tests', () => {
         });
     });
     
-    describe('PUT /picks/:id', () => {
+    describe('PUT /picks', () => {
         it('It should update a pick if all fields are valid', (done) => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .put('/picks/1')
+            .put('/picks')
             .set(TOKEN_HEADER, token)
             .send(picks[3])
             .then(res => {
@@ -149,7 +129,6 @@ describe('Picks Tests', () => {
                     status: 'success',
                     message: joi.string().valid(picksMessages.PICK_UPDATE_SUCCESS),
                     data: joi.object({
-                        gameweek_id: joi.number().integer().required(),
                         pick_items: joi.array().items({
                             fixture_id: joi.number().integer().required(),
                             home_pick: joi.number().integer().required(),
@@ -164,32 +143,12 @@ describe('Picks Tests', () => {
             .catch(done);
         });
     
-        it('It should return 404 with response Pick not found', (done) => {
-            let token = AuthService.generateToken({ id : 1 });
-    
-            chai.request(server)
-            .put('/picks/1000000')
-            .set(TOKEN_HEADER, token)
-            .send(picks[3])
-            .then(res => {
-                expect(res).to.have.status(404);
-                const schema = joi.object({
-                    status: 'error',
-                    message: joi.string().valid(picksErrors.PICK_NOT_FOUND),
-                    data: null
-                });
-                joi.assert(res.body, schema);
-                done();
-            })
-            .catch(done);
-        });
-    
         it('It should return 400 with response Master pick cannot be less than one', 
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .put('/picks/1')
+            .put('/picks')
             .set(TOKEN_HEADER, token)
             .send(picks[4])
             .then(res => {
@@ -210,7 +169,7 @@ describe('Picks Tests', () => {
             let token = AuthService.generateToken({ id : 1 });
     
             chai.request(server)
-            .put('/picks/1')
+            .put('/picks')
             .set(TOKEN_HEADER, token)
             .send(picks[5])
             .then(res => {
@@ -243,20 +202,15 @@ describe('Picks Tests', () => {
                     data: joi.object({
                         id: joi.number().integer().required(),
                         player_id: joi.number().integer().required(),
-                        gameweek_id: joi.number().integer().required(),
                         total_points: joi.number().integer().required(),
                         updatedAt: joi.date().required(),
-                        createdAt: joi.date().required(),
                         pick_items: joi.array().items({
-                            id: joi.number().integer().required(),
                             fixture_id: joi.number().integer().required(),
                             home_pick: joi.number().integer().required(),
                             away_pick: joi.number().integer().required(),
                             points: joi.number().integer().required(),
                             is_master_pick: joi.bool().required(),
-                            picks_id: joi.number().integer().required(),
-                            updatedAt: joi.date().required(),
-                            createdAt: joi.date().required()
+                            updatedAt: joi.date().required()
                         })
                     })
                 });

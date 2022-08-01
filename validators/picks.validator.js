@@ -10,7 +10,6 @@ const picksValidator = {
         })
     }),
     updatePickSchema: joi.object({
-        gameweek_id: joi.number().integer().min(1).required(),
         pick_items: joi.array().min(1).items({
             fixture_id: joi.number().integer().min(1).required(),
             home_pick: joi.number().integer().min(0).required(),

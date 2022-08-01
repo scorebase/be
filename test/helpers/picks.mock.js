@@ -66,7 +66,6 @@ const picks = [
         ]
     },
     {
-        "gameweek_id": 1,
         "pick_items": [
             {
                 "fixture_id": 1,
@@ -89,7 +88,6 @@ const picks = [
         ]
     },
     {
-        "gameweek_id": 1,
         "pick_items": [
             {
                 "fixture_id": 1,
@@ -112,7 +110,6 @@ const picks = [
         ]
     },
     {
-        "gameweek_id": 1,
         "pick_items": [
             {
                 "fixture_id": 1,
@@ -134,6 +131,16 @@ const picks = [
             }
         ]
     },
+    {
+        "pick_items": [
+            {
+                "fixture_id": 1,
+                "home_pick": 5,
+                "away_pick": 3,
+                "is_master_pick": true
+            }
+        ]
+    }
 ]
 
 module.exports = picks;

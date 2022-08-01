@@ -270,12 +270,6 @@ describe('Gameweek Test  /gameweek', () => {
     })
 
     describe('GET /state', () => {
-        before(async () => {
-            await GameWeekState.bulkCreate([
-                { state : 'current', id : 1},
-                { state : 'next', id : null }
-            ]);
-        })
         it('should fetch gameweek state successfully', (done) => {
             const validToken = AuthService.generateToken({ id: 1 });
             chai

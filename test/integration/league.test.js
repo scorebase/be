@@ -11,6 +11,7 @@ const LeagueService = require('../../services/league.service');
 const League = require('../../models/league.model');
 const LeagueMember = require('../../models/league_member.model');
 const users = require('../helpers/users.mock');
+const User = require('../../models/user.model');
 
 describe('LEAGUE TESTS', () => {
     describe('POST /league', () => {
@@ -171,7 +172,6 @@ describe('LEAGUE TESTS', () => {
         let token = AuthService.generateToken({ id : 1 });
         let tokenUserTwo = AuthService.generateToken({ id : 2 });
         let tokenUserThree = AuthService.generateToken({ id : 3 });
-        let tokenUserFour = AuthService.generateToken({ id : 4 });
         it('join league successfully.', () => {
             return new Promise(async function (resolve, reject) {
                 const { invite_code } = await League.findByPk(1);
@@ -274,15 +274,16 @@ describe('LEAGUE TESTS', () => {
         it('should fail if user is suspended from league', () => {
             return new Promise(async function (resolve, reject) {
                 const { invite_code } = await LeagueService.loadLeague(1);
+                await User.create(users[3])
                 await LeagueMember.create({
-                    player_id : 4,
+                    player_id : 3,
                     league_id : 1,
                     is_suspended : true
                 });
                 chai.request(server)
                 .post('/league/join')
                 .send({ invite_code })
-                .set(TOKEN_HEADER, tokenUserFour)
+                .set(TOKEN_HEADER, tokenUserThree)
                 .then(res => {
                     expect(res).to.have.status(400);
                     expect(res.body.message).to.equal(leagueErrors.SUSPENDED_FROM_LEAGUE)
@@ -297,6 +298,7 @@ describe('LEAGUE TESTS', () => {
         let token = AuthService.generateToken({ id : 1 })
         let tokenUserTwo = AuthService.generateToken({ id : 2 });
         let tokenUserThree = AuthService.generateToken({ id : 3 });
+        let tokenUserFour = AuthService.generateToken({ id : 4 });
         it('should leave a league successfully', (done) => {
             chai.request(server)
             .put('/league/1/leave')
@@ -316,7 +318,7 @@ describe('LEAGUE TESTS', () => {
         it('should fail if user is not a participant', (done) => {
             chai.request(server)
             .put('/league/1/leave')
-            .set(TOKEN_HEADER, tokenUserThree)
+            .set(TOKEN_HEADER, tokenUserFour)
             .then(res => {
                 expect(res).to.have.status(400);
                 expect(res.body.message).to.equal(leagueErrors.NOT_A_PARTICIPANT)
@@ -391,7 +393,7 @@ describe('LEAGUE TESTS', () => {
         let token = AuthService.generateToken({ id : 1 });
         it('should restore player successfully', (done) => {
             chai.request(server)
-            .put('/league/1/restore/4')
+            .put('/league/1/restore/2')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(200);
@@ -423,8 +425,8 @@ describe('LEAGUE TESTS', () => {
                 expect(res).to.have.status(200);
                 const schema = joi.array().items(joi.object({
                     id: joi.number().integer().required(),
-                    username: joi.string().valid(users[1].username).required(),
-                    full_name: joi.string().valid(users[1].fullName).required()
+                    username: joi.string().valid(users[3].username).required(),
+                    full_name: joi.string().valid(users[3].full_name).required()
                 }))
                 joi.assert(res.body.data, schema)
                 done()

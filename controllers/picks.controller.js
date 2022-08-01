@@ -7,7 +7,7 @@ const { PICK_CREATE_SUCCESS, PICK_UPDATE_SUCCESS, PICK_FOUND_SUCCESS } = picksMe
 const PicksController = {
     async createPick(req, res, next) {
         try {
-            const data = await PicksService.createPick(req.body, req.userId, req.params.gameweekId);
+            const data = await PicksService.createPick(req.body, req.userId);
             return successResponse(res, PICK_CREATE_SUCCESS, data);
         } catch(error) {
             next(error);
@@ -16,7 +16,7 @@ const PicksController = {
 
     async updatePick(req, res, next) {
         try {
-            const data = await PicksService.updatePick(req.body, req.userId, req.params.id);
+            const data = await PicksService.updatePick(req.body, req.userId);
             return successResponse(res, PICK_UPDATE_SUCCESS, data);
         } catch(error) {
             next(error);
