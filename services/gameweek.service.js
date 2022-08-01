@@ -44,7 +44,7 @@ class GameweekService {
      * @returns {object} data containing requested gameweek
      */
     static async loadGameweek(gameweekId) {
-        const gameweek = await Gameweek.findByPk(gameweekId);
+        const gameweek = await Gameweek.findByPk(gameweekId, {attributes : ['id', 'title', 'deadline']});
         if(!gameweek){
             throw new NotFoundError(GAMEWEEK_NOT_FOUND);
         }
