@@ -8,7 +8,7 @@ const logger = require('../logger');
 class User extends Model {
     static async hashPassword(user) {
         try {
-            const hash = await bcrypt.hash(user.password, 10);
+            const hash = await bcrypt.hash(user.password, 7);
             user.password = hash;
         } catch (error) {
             logger.error(
