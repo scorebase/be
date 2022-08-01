@@ -33,7 +33,7 @@ Picks.belongsTo(User, {
 
 Picks.belongsTo(GameWeek, {
     foreignKey : 'gameweek_id',
-    onDelete : 'SET NULL'
+    onDelete : 'RESTRICT'
 });
 
 module.exports = Picks;
