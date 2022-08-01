@@ -3,11 +3,12 @@ module.exports = {
         FIXTURE_NOT_FOUND: 'Fixture not found'
     },
     picksErrors : {
-        MASTER_PICK_LESS_THAN_ONE: 'Master pick cannot be less than 1',
-        MASTER_PICK_GREATER_THAN_ONE: 'Master pick cannot be greater than 1',
-        PICK_ALREADY_EXISTS: 'Pick already exists',
-        PICK_NOT_FOUND: 'Pick not found',
-        PICK_ACCESS_DENIED: 'Pick Access Denied'
+        MASTER_PICK_LESS_THAN_ONE: 'You must have a master pick.',
+        MASTER_PICK_GREATER_THAN_ONE: 'Only one master pick allowed.',
+        PICK_ALREADY_EXISTS: 'You have made pick already.',
+        PICK_NOT_FOUND: 'Pick not found.',
+        PICK_ACCESS_DENIED: 'Pick Access Denied.',
+        INVALID_PICKS : 'Picks are invalid.'
     },
     authErrors : {
         INVALID_CREDENTIALS_ERROR :'Invalid credentials.',
