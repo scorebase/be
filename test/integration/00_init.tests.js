@@ -14,22 +14,33 @@ const fixtures = require('../helpers/fixtures.mock');
 const server = require('../..');
 const joi = require('joi');
 const logger = require('../../logger');
+const GameWeekState = require('../../models/gameweek_state.model');
+const LeagueType = require('../../models/league_types.model');
 
 
 chai.use(chaiHttp)
 
 before(async () => {
-    logger.debug("INTEGRATION TESTS STARTED");
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}) //a hack for now
-    await sequelize.sync({ force : true });
-    await User.create(users[0]);
-    await Team.create(teams[0]);
-    await Team.create(teams[1]);
-    await Team.create(teams[2]);
-    await Team.create(teams[3]);
-    await Season.create(seasons[0]);
-    await GameWeek.create(gameweeks[0]);
-    await Fixture.create(fixtures[0]);
+        logger.debug("INTEGRATION TESTS STARTED");
+        await sequelize.sync({ force : true });
+        await User.create(users[0]);
+        await Team.create(teams[0]);
+        await Team.create(teams[1]);
+        await Team.create(teams[2]);
+        await Team.create(teams[3]);
+        await Season.create(seasons[0]);
+        await GameWeek.create(gameweeks[0]);
+        await GameWeekState.bulkCreate([
+            { state : 'current', id : null},
+            { state : 'next', id : 1 }
+        ])
+        await Fixture.create(fixtures[0]);
+        await LeagueType.bulkCreate(
+        [
+            {name : 'general'},
+            { name : 'public' },
+            { name : 'private' }
+        ]);
 });
 
 describe("Sample Test /", () => {
