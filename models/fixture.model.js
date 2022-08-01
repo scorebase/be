@@ -7,10 +7,12 @@ class Fixture extends Model {}
 
 Fixture.init({
     home_team_id: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull : false
     },
     away_team_id: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull : false
     },
     away_score: {
         type: DataTypes.INTEGER,
@@ -42,13 +44,13 @@ Fixture.init({
 Fixture.belongsTo(Team, {
     foreignKey : 'away_team_id',
     as: 'away_team',
-    onDelete : 'SET NULL'
+    onDelete : 'CASCADE'
 });
 
 Fixture.belongsTo(Team, {
     foreignKey : 'home_team_id',
     as: 'home_team',
-    onDelete : 'SET NULL'
+    onDelete : 'CASCADE'
 });
 
 Fixture.belongsTo(GameWeek, {
