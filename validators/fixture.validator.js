@@ -10,8 +10,8 @@ const fixtureValidator = {
     updateFixtureSchema: joi.object({
         home_team_id: joi.number().integer().min(1).required(),
         away_team_id: joi.number().integer().min(1).required(),
-        away_score: joi.number().integer().min(0).required(),
-        home_score: joi.number().integer().min(0).required(),
+        away_score: joi.number().integer().min(0).allow(null).required(),
+        home_score: joi.number().integer().min(0).allow(null).required(),
         date_time: joi.date().required(),
         gameweek_id: joi.number().integer().min(1).required(),
         is_complete: joi.bool().required()
