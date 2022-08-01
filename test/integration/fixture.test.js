@@ -177,25 +177,6 @@ describe('FIXTURE TESTS', () => {
             })
             .catch(done);
         });
-    
-        it('It should return status code 404 with response Gameweek not found', (done) => {
-            let token = AuthService.generateToken({ id : 1 });
-    
-            chai.request(server)
-            .get('/fixture/all/1000000')
-            .set(TOKEN_HEADER, token)
-            .then(res => {
-                expect(res).to.have.status(404);
-                const schema = joi.object({
-                    status: 'error',
-                    message: joi.string().valid(gameweekErrors.GAMEWEEK_NOT_FOUND),
-                    data: null
-                });
-                joi.assert(res.body, schema);
-                done();
-            })
-            .catch(done);
-        });
     });
     
     describe('/GET /fixture/all/headtohead?teamOne={teamOneId}&teamTwo={teamTwoId}', () => {
