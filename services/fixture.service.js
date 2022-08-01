@@ -1,12 +1,11 @@
 const Fixture = require('../models/fixture.model');
-const GameWeek = require('../models/gameweek.model');
 const Team = require('../models/team.model');
 const { NotFoundError, ServiceError } = require('../errors/http_errors');
-const { fixtureErrors, gameweekErrors, teamErrors } = require('../errors');
+const { fixtureErrors, teamErrors } = require('../errors');
 const { Op } = require('sequelize');
+const GameweekService = require('./gameweek.service');
 
 const { FIXTURE_NOT_FOUND } = fixtureErrors;
-const { GAMEWEEK_NOT_FOUND } = gameweekErrors;
 const { UNIQUE_IDS } = teamErrors;
 
 class FixtureService {
@@ -47,9 +46,6 @@ class FixtureService {
     }
 
     static async getFixtures(gameweek_id) {
-        const gameweekExists = await GameWeek.findByPk(gameweek_id);
-        if (!gameweekExists) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
-
         const fixtures = await Fixture.findAll({
             where: { gameweek_id: gameweek_id },
             include : [{
@@ -118,6 +114,21 @@ class FixtureService {
             ]
         });
         return teamsHeadToHeadFixtures;
+    }
+
+    /**
+     * Get id of all the fixtures in current gameweek
+     * @returns {array} the ids of fixtures
+     */
+    static async getCurrentFixturesIds() {
+        const { next } = await GameweekService.getGameweekState();
+        if(!next) return [];
+
+        const fixtures = await Fixture.findAll({ where : { gameweek_id : next.id }, attributes : ['id'] });
+
+        const ids = fixtures.map(fix => fix.id);
+
+        return ids;
     }
 }
 

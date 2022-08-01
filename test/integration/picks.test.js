@@ -9,10 +9,15 @@ const { picksMessages } = require('../../helpers/messages');
 const AuthService = require('../../services/auth.service');
 
 const picks = require('../helpers/picks.mock');
+const Fixture = require('../../models/fixture.model');
+const fixtures = require('../helpers/fixtures.mock');
 
 
 describe('Picks Tests', () => {
     describe('POST /picks', () => {
+        before(async () => {
+            await Fixture.create(fixtures[3]);
+        })
         it('It should return 400 with response Master pick cannot be less than one', 
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
@@ -20,7 +25,7 @@ describe('Picks Tests', () => {
             chai.request(server)
             .post('/picks')
             .set(TOKEN_HEADER, token)
-            .send(picks[1])
+            .send(picks[4])
             .then(res => {
                 expect(res).to.have.status(400);
                 const schema = joi.object({
@@ -41,7 +46,7 @@ describe('Picks Tests', () => {
             chai.request(server)
             .post('/picks')
             .set(TOKEN_HEADER, token)
-            .send(picks[2])
+            .send(picks[5])
             .then(res => {
                 expect(res).to.have.status(400);
                 const schema = joi.object({
@@ -54,6 +59,28 @@ describe('Picks Tests', () => {
             })
             .catch(done);
         });
+
+        it(`should return gameweek not found if player is making pick for 
+            invalid gameweek or made more picks than fixtures`, (done) => {
+
+            let token = AuthService.generateToken({ id : 1 });
+    
+            chai.request(server)
+            .post('/picks')
+            .set(TOKEN_HEADER, token)
+            .send(picks[0])
+            .then(res => {
+                expect(res).to.have.status(400);
+                const schema = joi.object({
+                    status: 'error',
+                    message: joi.string().valid(picksErrors.INVALID_PICKS),
+                    data: null
+                });
+                joi.assert(res.body, schema);
+                done();
+            })
+            .catch(done);
+        })
     
         it('It should create a pick by gameweekId if all fields are valid', 
         (done) => {
