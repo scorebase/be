@@ -122,9 +122,7 @@ describe('Gameweek Test  /gameweek', () => {
                     data: joi.object({
                         id: joi.number().integer().required(),
                         deadline: joi.date().required(),
-                        title: joi.string().valid(gameweeks[0].title),
-                        updatedAt: joi.date().required(),
-                        createdAt: joi.date().required(),
+                        title: joi.string().valid(gameweeks[0].title)
                     }),
                 })
 
