@@ -18,7 +18,6 @@ League.init(
         },
         type: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             comment : 'general, public or private league.'
         },
         max_participants: {
@@ -26,8 +25,7 @@ League.init(
             allowNull: false
         },
         administrator_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false
+            type: DataTypes.INTEGER
         },
         starting_gameweek: {
             type: DataTypes.INTEGER,
@@ -48,11 +46,13 @@ League.init(
 
 League.belongsTo(User, {
     foreignKey : 'administrator_id',
-    as : 'administrator'
+    as : 'administrator',
+    onDelete : 'SET NULL'
 });
 
 League.belongsTo(LeagueType, {
-    foreignKey : 'type'
+    foreignKey : 'type',
+    onDelete : 'SET NULL'
 });
 
 module.exports = League;

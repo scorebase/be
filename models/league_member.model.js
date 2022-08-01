@@ -26,12 +26,14 @@ LeagueMember.init({
 });
 
 LeagueMember.belongsTo(League, {
-    foreignKey : 'league_id'
+    foreignKey : 'league_id',
+    onDelete : 'CASCADE'
 });
 
 LeagueMember.belongsTo(User, {
     foreignKey : 'player_id',
-    as: 'player'
+    as: 'player',
+    onDelete : 'CASCADE'
 });
 
 module.exports = LeagueMember;

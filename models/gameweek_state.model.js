@@ -25,7 +25,8 @@ GameWeekState.init(
 
 GameWeekState.belongsTo(GameWeek, {
     foreignKey : 'id',
-    as : 'gameweek'
+    as : 'gameweek',
+    onDelete : 'SET NULL'
 });
 
 //populate with our two states
