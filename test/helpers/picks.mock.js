@@ -66,7 +66,6 @@ const picks = [
         ]
     },
     {
-        "gameweek_id": 1,
         "pick_items": [
             {
                 "fixture_id": 1,
@@ -78,27 +77,20 @@ const picks = [
                 "fixture_id": 2,
                 "home_pick": 5,
                 "away_pick": 3,
-                "is_master_pick": true
+                "is_master_pick": false
             },
             {
                 "fixture_id": 3,
                 "home_pick": 0,
                 "away_pick": 5,
-                "is_master_pick": false
+                "is_master_pick": true
             }
         ]
     },
     {
-        "gameweek_id": 1,
         "pick_items": [
             {
                 "fixture_id": 1,
-                "home_pick": 5,
-                "away_pick": 3,
-                "is_master_pick": false
-            },
-            {
-                "fixture_id": 2,
                 "home_pick": 5,
                 "away_pick": 3,
                 "is_master_pick": false
@@ -112,7 +104,6 @@ const picks = [
         ]
     },
     {
-        "gameweek_id": 1,
         "pick_items": [
             {
                 "fixture_id": 1,
@@ -121,19 +112,29 @@ const picks = [
                 "is_master_pick": true
             },
             {
-                "fixture_id": 2,
+                "fixture_id": 3,
+                "home_pick": 0,
+                "away_pick": 5,
+                "is_master_pick": true
+            }
+        ]
+    },
+    {
+        "pick_items": [
+            {
+                "fixture_id": 1,
                 "home_pick": 5,
                 "away_pick": 3,
                 "is_master_pick": true
             },
             {
                 "fixture_id": 3,
-                "home_pick": 0,
-                "away_pick": 5,
+                "home_pick": 5,
+                "away_pick": 3,
                 "is_master_pick": false
             }
         ]
-    },
+    }
 ]
 
 module.exports = picks;

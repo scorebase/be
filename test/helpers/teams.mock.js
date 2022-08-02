@@ -23,6 +23,11 @@ const teams = [
         "name": "Leeds",
         "short_name": "LEE",
         "jersey": "https://leeds.com/jersey-image"
+    },
+    {
+        "name": "Norwich",
+        "short_name": "NOR",
+        "jersey": "https://norwich.com/jersey-image"
     }
 ];
 

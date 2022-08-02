@@ -5,14 +5,17 @@ const {
     GAMEWEEK_CREATED_SUCCESS,
     GAMEWEEK_DELETED_SUCCESS,
     GAMEWEEK_LOADED_SUCCESS,
-    GAMEWEEK_UPDATED_SUCCESS
+    GAMEWEEK_UPDATED_SUCCESS,
+    GAMEWEEK_STATUS_GET_SUCCESS,
+    GAMEWEEK_STATUS_UPDATED_SUCCESS,
+    GAMEWEEKS_LOAD_SUCCESS
 } = gameweekMessages;
 
 const gameweekController = {
     async createAGameweek(req, res, next){
         try {
-            const { title, deadline, seasonId } = req.body;
-            const data = await GameweekService.createGameweek(deadline, title, seasonId);
+            const { title, deadline } = req.body;
+            const data = await GameweekService.createGameweek(deadline, title);
 
             return successResponse(res, GAMEWEEK_CREATED_SUCCESS, data);
         } catch (error) {
@@ -34,8 +37,8 @@ const gameweekController = {
     async editGameweek(req, res, next) {
         try {
             const gameweekId = req.params.gameweekId;
-            const { deadline, title, seasonId } = req.body;
-            const data = await GameweekService.updateGameweek(gameweekId, deadline, title, seasonId);
+            const { deadline, title } = req.body;
+            const data = await GameweekService.updateGameweek(gameweekId, deadline, title);
 
             return successResponse(res, GAMEWEEK_UPDATED_SUCCESS, data);
         } catch (error) {
@@ -49,6 +52,37 @@ const gameweekController = {
             const data = await GameweekService.deleteGameweek(gameweekId);
 
             return successResponse(res, GAMEWEEK_DELETED_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+    async getGameweekState(req, res, next) {
+        try {
+            const data = await GameweekService.getGameweekState();
+            return successResponse(res, GAMEWEEK_STATUS_GET_SUCCESS , data);
+            
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async updateGameweekState(req, res, next) {
+        try {
+            let { next, current } = req.body;
+            if(next === 0) next = null;
+            if(current === 0) current = null;
+            const data = await GameweekService.updateGameweekState(current, next);
+            return successResponse(res, GAMEWEEK_STATUS_UPDATED_SUCCESS , data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async getAllGameweeks(req, res, next) {
+        try {
+            const data = await GameweekService.getAllGameweeks();
+
+            return successResponse(res, GAMEWEEKS_LOAD_SUCCESS ,data);
         } catch (error) {
             next(error);
         }

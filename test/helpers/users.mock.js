@@ -17,6 +17,12 @@ const users = [
         email : "email@email.dev",
         password : "password123"
     },
+    {
+        full_name : "Name Four",
+        username : "usernameFour",
+        email : "email@email.devy",
+        password : "password12343"
+    },
 ];
 
 module.exports = users;

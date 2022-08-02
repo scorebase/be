@@ -2,7 +2,7 @@ const express = require('express');
 
 const FixtureController = require('../controllers/fixture.controller');
 
-const { isLoggedIn } = require('../middlewares/auth.middleware');
+const { isLoggedIn, isAdmin } = require('../middlewares/auth.middleware');
 const { validateBody, validateQuery } = require('../validators');
 const {
     createFixtureSchema,
@@ -15,25 +15,24 @@ const fixtureRouter = express.Router();
 fixtureRouter.post('/',
     validateBody(createFixtureSchema),
     isLoggedIn,
+    isAdmin,
     FixtureController.createFixture);
 
-fixtureRouter.delete('/:id', isLoggedIn, FixtureController.deleteFixture);
+fixtureRouter.delete('/:id', isLoggedIn, isAdmin, FixtureController.deleteFixture);
 
 fixtureRouter.put('/:id',
     validateBody(updateFixtureSchema),
-    isLoggedIn,
+    isAdmin,
     FixtureController.updateFixture);
     
 fixtureRouter.get('/all/headtohead',
     validateQuery(headToheadSchema),
-    isLoggedIn,
     FixtureController.getHeadToHeadFixtures);
 
-fixtureRouter.get('/all/:gameweekId', isLoggedIn ,FixtureController.getFixtures);
+fixtureRouter.get('/all/:gameweekId', FixtureController.getFixtures);
 
 fixtureRouter.get('/all/recent/:teamId',
     validateQuery(recentFixturesSchema),
-    isLoggedIn,
     FixtureController.getRecentFixtures);
 
 module.exports = fixtureRouter;

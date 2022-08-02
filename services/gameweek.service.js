@@ -1,36 +1,28 @@
 const { Op } = require('sequelize');
 const Gameweek = require('../models/gameweek.model');
-const Season = require('../models/season.model');
+
 const { ServiceError, NotFoundError } = require('../errors/http_errors');
-const { gameweekErrors, seasonErrors } = require('../errors/index');
+const { gameweekErrors } = require('../errors/index');
+const GameWeekState = require('../models/gameweek_state.model');
+const sequelize = require('../config/db');
+
 const {
     GAMEWEEK_NOT_FOUND,
     GAMEWEEK_TITLE_EXISTS,
     GAMEWEEK_DEADLINE_ERROR
 } = gameweekErrors;
 
-const {
-    SEASON_NOT_FOUND
-} = seasonErrors;
-
 class GameweekService {
 
     /**
      * @param {date} deadline deadline for user to predict a fixture in a gameweek;
      * @param {string} title gameweek title
-     * @param {integer} seasonId season id to which the gameweek belongs in.
      * @returns {object} created gameweek
      */
-    static async createGameweek(deadline, title, seasonId) {
-        const seasonExists = await Season.findByPk(seasonId);
-        if(!seasonExists){
-            throw new NotFoundError(SEASON_NOT_FOUND);
-        }
-
+    static async createGameweek(deadline, title) {
         const gameweekExists = await Gameweek.findOne({ where:
-        {
-            [Op.and] : [{ title: title}, {season_id : seasonId }]
-        }});
+            { title: title }
+        });
         if(gameweekExists){
             throw new ServiceError(GAMEWEEK_TITLE_EXISTS);
         }
@@ -42,7 +34,7 @@ class GameweekService {
             throw new ServiceError(GAMEWEEK_DEADLINE_ERROR);
         }
 
-        const gameweek = await Gameweek.create({ deadline: deadlineDate, title, season_id: seasonId });
+        const gameweek = await Gameweek.create({ deadline: deadlineDate, title });
         
         return gameweek;
     }
@@ -52,7 +44,7 @@ class GameweekService {
      * @returns {object} data containing requested gameweek
      */
     static async loadGameweek(gameweekId) {
-        const gameweek = await Gameweek.findByPk(gameweekId);
+        const gameweek = await Gameweek.findByPk(gameweekId, {attributes : ['id', 'title', 'deadline']});
         if(!gameweek){
             throw new NotFoundError(GAMEWEEK_NOT_FOUND);
         }
@@ -64,27 +56,21 @@ class GameweekService {
      * @param {Integer} gameweekId The requested gameweek
      * @param {Date} deadline gameweek deadline
      * @param {String} title gameweek title
-     * @param {Integer} seasonId season id of the gameweek
      * @returns {Object} updatedGameweek
      */
-    static async updateGameweek(gameweekId, deadline, title, seasonId) {
-        const seasonExists = await Season.findByPk(seasonId);
-        if(!seasonExists){
-            throw new NotFoundError(SEASON_NOT_FOUND);
-        }
+    static async updateGameweek(gameweekId, deadline, title) {
 
         const gameweekExists = await Gameweek.findByPk(gameweekId);
         if(!gameweekExists){
             throw new NotFoundError(GAMEWEEK_NOT_FOUND);
         }
 
-        console.log(typeof(gameweekId));
         const gameweekTitleExists = await Gameweek.findOne({ where:
             {
                 id: {
                     [Op.ne] : gameweekId
                 },
-                [Op.and] : [{ title: title}, {season_id : seasonId }]
+                title: title
             }});
 
         if(gameweekTitleExists){
@@ -98,7 +84,7 @@ class GameweekService {
             throw new ServiceError(GAMEWEEK_DEADLINE_ERROR);
         }
 
-        const updatedGameweek = { title, deadline: deadlineDate, season_id: seasonId };
+        const updatedGameweek = { title, deadline: deadlineDate };
 
         await Gameweek.update(updatedGameweek, { where: { id: gameweekId }});
 
@@ -121,6 +107,65 @@ class GameweekService {
         await Gameweek.destroy({ where: { id: gameweekId }});
 
         return null;
+    }
+
+    /**
+     * Fetch all gameweeks
+     * @returns array of all gameweeks
+     */
+    static async getAllGameweeks() {
+        const gameweeks = await Gameweek.findAll({ attributes : ['id', 'title']});
+
+        return gameweeks;
+    }
+
+    /**
+     * Fetches the state of the game i.e current gameweek and next gameweek
+     * @returns {array} the game states
+     */
+    static async getGameweekState() {
+        const states = await GameWeekState.findAll({
+            include : {
+                model : Gameweek,
+                as : 'gameweek',
+                attributes : ['id', 'deadline', 'title']
+            }
+        });
+
+        const data = { current : null, next : null };
+        states.forEach(s => {
+            data[s.state] = s.gameweek;
+        });
+
+        return data;
+    }
+
+    /**
+     * updates the state of the game i.e current gameweek and next gameweek
+     * @param {int|null} currentGw The current gameweek
+     * @param {int|null} nextGw The next gameweek
+     * @returns {void}
+     */
+    static async updateGameweekState(currentGw, nextGw) {
+        const t = await sequelize.transaction();
+
+        try {
+            await GameWeekState.destroy({ where : {}, transaction : t });
+
+            await GameWeekState.bulkCreate([
+                { state : 'current', id : currentGw},
+                { state : 'next', id : nextGw }
+            ], {
+                transaction : t
+            });
+
+            await t.commit();
+
+            return;
+        } catch(error) {
+            await t.rollback();
+            throw error;
+        }
     }
 };
 

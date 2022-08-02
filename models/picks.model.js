@@ -12,8 +12,7 @@ Picks.init(
             allowNull: false
         },
         gameweek_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false
+            type: DataTypes.INTEGER
         },
         total_points: {
             type: DataTypes.INTEGER,
@@ -28,11 +27,13 @@ Picks.init(
 );
 
 Picks.belongsTo(User, {
-    foreignKey : 'player_id'
+    foreignKey : 'player_id',
+    onDelete : 'CASCADE'
 });
 
 Picks.belongsTo(GameWeek, {
-    foreignKey : 'gameweek_id'
+    foreignKey : 'gameweek_id',
+    onDelete : 'RESTRICT'
 });
 
 module.exports = Picks;

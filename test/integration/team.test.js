@@ -1,26 +1,16 @@
 const { expect } = require('chai');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const joi = require('joi');
 const { TOKEN_HEADER } = require('../../helpers/constants');
 const server = require('../../index');
 const { teamMessages } = require('../../helpers/messages');
 const { teamErrors } = require('../../errors/index');
-const Team = require('../../models/team.model');
 
 const teams = require('../helpers/teams.mock');
-const users = require('../helpers/users.mock');
-const User = require('../../models/user.model');
 const AuthService = require('../../services/auth.service');
 
-chai.use(chaiHttp);
 
-describe('Teams Test /team', () => {
-    before(async () => {
-        await Team.sync({ force: true });
-        await Team.create(teams[0]);
-      });
-      
+describe('Teams Test /team', () => {      
       describe('POST /team', () => {
         it('It should return team with similar name exists if team with similar name exist', (done) => {
           const validToken = AuthService.generateToken({ id: 1 });
@@ -98,7 +88,7 @@ describe('Teams Test /team', () => {
             .request(server)
             .post('/team')
             .set(TOKEN_HEADER, validToken)
-            .send(teams[1])
+            .send(teams[4])
             .then((res) => {
               expect(res).to.have.status(200);
               const schema = joi.object({
@@ -106,9 +96,9 @@ describe('Teams Test /team', () => {
                 message: joi.string().valid(teamMessages.TEAM_CREATED_SUCCESS),
                 data: joi.object({
                   id: joi.number().integer().required(),
-                  name: joi.string().valid(teams[1].name),
-                  short_name: joi.string().valid(teams[1].short_name),
-                  jersey: joi.string().valid(teams[1].jersey),
+                  name: joi.string().valid(teams[4].name),
+                  short_name: joi.string().valid(teams[4].short_name),
+                  jersey: joi.string().valid(teams[4].jersey),
                   updatedAt: joi.date().required(),
                   createdAt: joi.date().required(),
                 }),
@@ -150,7 +140,7 @@ describe('Teams Test /team', () => {
         it('It should return an error, if it can not find a team with the id specified', (done) => {
           const validToken = AuthService.generateToken({ id : 1 })
           chai.request(server)
-          .get('/team/5')
+          .get('/team/6')
           .set(TOKEN_HEADER, validToken)
           .then(res => {
             expect(res).to.have.status(404)
@@ -170,7 +160,7 @@ describe('Teams Test /team', () => {
       describe('PUT /team/:teamId', () => {
         it('It should return the updated team data if all fields are valid', (done) => {
           const validToken = AuthService.generateToken({ id: 1 });
-          const teamData = {...teams[0], name: teams[3].name};
+          const teamData = {...teams[0], name: teams[5].name};
           chai.request(server)
           .put('/team/1')
           .set(TOKEN_HEADER, validToken)
@@ -181,7 +171,7 @@ describe('Teams Test /team', () => {
               status: 'success',
               message: joi.string().valid(teamMessages.TEAM_UPDATED_SUCCESS),
               data: joi.object({
-                name: joi.string().valid(teams[3].name),
+                name: joi.string().valid(teams[5].name),
                 short_name: joi.string().valid(teams[0].short_name),
                 jersey: joi.string().valid(teams[0].jersey),
                 id: joi.number().integer().required()
@@ -291,7 +281,7 @@ describe('Teams Test /team', () => {
         it('It should delete the team from the DB and return success', (done) => {
           const validToken = AuthService.generateToken({ id: 1 })
           chai.request(server)
-          .delete('/team/1')
+          .delete('/team/5')
           .set(TOKEN_HEADER, validToken)
           .then(res => {
             expect(res).to.have.status(200)
@@ -310,7 +300,7 @@ describe('Teams Test /team', () => {
         it('It should return an error, if it can not find a team with the id specified', (done) => {
             const validToken = AuthService.generateToken({ id : 1 })
             chai.request(server)
-            .delete('/team/5')
+            .delete('/team/8')
             .set(TOKEN_HEADER, validToken)
             .then(res => {
               expect(res).to.have.status(404)
@@ -325,5 +315,29 @@ describe('Teams Test /team', () => {
             })
             .catch(done)
           })
+      })
+
+      describe('GET /team/all', () => {
+        it('should get all teams successfully', (done) => {
+          chai
+              .request(server)
+              .get('/team/all')
+              .then((res) => {
+                  expect(res).to.have.status(200);
+                  const schema = joi.object({
+                      status: 'success',
+                      message: joi.string().valid(teamMessages.TEAM_LIST_LOADED),
+                      data : joi.array().items({
+                          id : joi.number().integer().positive().required(),
+                          name : joi.string().required(),
+                          short_name : joi.string().required(),
+                          jersey : joi.string().required()
+                      })
+                  });
+                  joi.assert(res.body, schema);
+                  done();
+              })
+              .catch(done);
+        })
       })
 });

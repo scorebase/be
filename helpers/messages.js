@@ -19,7 +19,8 @@ module.exports = {
         TEAM_CREATED_SUCCESS: 'Team created successfully.',
         TEAM_UPDATED_SUCCESS: 'Team updated successfully.',
         TEAM_DELETED_SUCCESS: 'Team deleted successfully',
-        TEAM_FOUND_SUCCESS: 'Team found successfully'
+        TEAM_FOUND_SUCCESS: 'Team found successfully',
+        TEAM_LIST_LOADED : 'Teams loaded.'
     },
     seasonMessages: {
         SEASON_CREATED_SUCCESS: 'This season has been created successfully.',
@@ -31,7 +32,10 @@ module.exports = {
         GAMEWEEK_CREATED_SUCCESS: 'This gameweek has been created successfully.',
         GAMEWEEK_UPDATED_SUCCESS: 'This gameweek has been updated successfully.',
         GAMEWEEK_LOADED_SUCCESS: 'This gameweek has been loaded successfully.',
-        GAMEWEEK_DELETED_SUCCESS: 'This gameweek has been deleted successfully.'
+        GAMEWEEK_DELETED_SUCCESS: 'This gameweek has been deleted successfully.',
+        GAMEWEEK_STATUS_UPDATED_SUCCESS : 'Gameweek status updated successfully.',
+        GAMEWEEK_STATUS_GET_SUCCESS : 'Gameweek status loaded successfully.',
+        GAMEWEEKS_LOAD_SUCCESS : 'Gameweeks loaded succesfully.'
     },
     leagueMessages : {
         LEAGUE_CREATION_SUCCESS : 'League created successfully.',

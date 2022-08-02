@@ -1,25 +1,15 @@
 const { expect } = require('chai');
 const chai = require('chai');
-const chaiHttp = require('chai-http');
 const joi = require('joi');
 
 const server = require('../..');
-const sequelize = require('../../config/db');
 const { authErrors } = require('../../errors');
 const { TOKEN_HEADER } = require('../../helpers/constants');
 const { authMessages } = require('../../helpers/messages');
-const User = require('../../models/user.model');
+
 const AuthService = require('../../services/auth.service');
+
 const users = require('../helpers/users.mock');
-
-chai.use(chaiHttp);
-
-
-before(async () => {
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0', {raw: true}) //a hack for now
-    await sequelize.sync({ force : true });
-    await User.create(users[0]);
-});
 
 describe('AUTH TESTS', () => {
     describe('POST /auth/register', () => {

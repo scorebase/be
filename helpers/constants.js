@@ -1,5 +1,7 @@
 module.exports.TOKEN_HEADER = 'x-user-token';
 
+module.exports.ADMIN_SECRET_HEADER = 'x-admin-secret';
+
 module.exports.LEAGUE_TYPES = {general : 1, public : 2, private : 3};
 
 module.exports.LEAGUE_CODE_LENGTH = 7;

@@ -42,12 +42,14 @@ PickItem.init(
 );
 
 PickItem.belongsTo(Picks, {
-    foreignKey : 'picks_id'
+    foreignKey : 'picks_id',
+    onDelete : 'CASCADE'
 });
 
 PickItem.belongsTo(Fixture, {
     foreignKey : 'fixture_id',
-    as : 'fixture'
+    as : 'fixture',
+    onDelete : 'CASCADE'
 });
 
 module.exports = PickItem;
