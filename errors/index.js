@@ -51,6 +51,10 @@ module.exports = {
         PLAYER_NOT_IN_LEAGUE : 'Player not in league.',
         SUSPENDED_FROM_LEAGUE : 'You have been suspended from this league.',
         PLAYER_NOT_IN_SUSPENDED_LIST : 'Player is not in the list of suspended players.',
-        ADMIN_NO_LEAVE : 'You cannot leave this league. Change the administrator to leave'
+        ADMIN_NO_LEAVE : 'You cannot leave this league. Change the administrator to leave',
+        INVALID_PAGE : 'Invalid page number'
+    },
+    statsErrors : {
+        STAT_ACCESS_DENIED : 'Stats cannot be viewed.'
     }
 };

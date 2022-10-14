@@ -1,11 +1,13 @@
 const { customAlphabet } = require('nanoid');
-
 const sequelize = require('../config/db');
 const { leagueErrors } = require('../errors');
 const { NotFoundError, ForbiddenError, ServiceError } = require('../errors/http_errors');
 const { LEAGUE_CODE_LENGTH, MAX_LEAGUES_PER_PLAYER } = require('../helpers/constants');
 const League = require('../models/league.model');
 const LeagueMember = require('../models/league_member.model');
+const { playerLeaguesQuery, leagueStandingQuery} = require('../helpers/query/league.query');
+const {QueryTypes, col} = require('sequelize');
+const GameweekService = require('./gameweek.service');
 
 const alphabet = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 class LeagueService {
@@ -35,13 +37,13 @@ class LeagueService {
                 starting_gameweek,
                 administrator_id : userId
             }, { transaction : t });
-    
+
             //automatically add the creator to the league
             await LeagueMember.create({
                 player_id : userId,
                 league_id : league.id
             }, { transaction : t });
-            
+
             await t.commit();
 
             return league.toJSON();
@@ -113,7 +115,7 @@ class LeagueService {
 
         const league = await League.findOne({
             where : { invite_code }, raw : true,
-            attributes : ['is_closed', 'id', 'max_participants']
+            attributes : ['is_closed', 'id', 'max_participants', 'name', 'type', 'administrator_id']
         });
 
         if(!league) throw new NotFoundError(leagueErrors.INVALID_LEAGUE_CODE);
@@ -129,7 +131,7 @@ class LeagueService {
 
             throw new ServiceError(leagueErrors.LEAGUE_ALREADY_JOINED);
         }
-        
+
         //ensure the league has not reached its maximum number of participants
         const current_participants = await LeagueMember.count({
             where : { league_id : league.id, is_suspended : false }
@@ -143,15 +145,19 @@ class LeagueService {
             league_id : league.id
         });
 
-        //do not return anything. User will only get a succes message.
-        return;
+        const data = { name : league.name, id : league.id,
+            type : league.type,
+            administrator_id : league.administrator_id };
+
+        //do not return anything. User will only get a success message.
+        return data;
     }
     /**
      * @param {number} userId id of the user that want to leave league
      * @param {string} leagueId League id
      */
     static async leaveLeague(userId, leagueId) {
-        const league = await this.loadLeague(leagueId);
+        const league = await this.loadLeague(leagueId, true);
         //ensure an admin can't leave their own league
         if(league.administrator_id === userId) throw new ServiceError(leagueErrors.ADMIN_NO_LEAVE);
 
@@ -162,8 +168,6 @@ class LeagueService {
         if(!isLeagueMember) throw new ServiceError(leagueErrors.NOT_A_PARTICIPANT);
 
         await isLeagueMember.destroy();
-
-        return;
     }
     /**
      * Remove a player from a league
@@ -172,7 +176,7 @@ class LeagueService {
      * @param {number} userId id of person making request (must be league admin)
      */
     static async removePlayer(playerId, leagueId, userId) {
-        const league = await this.loadLeague(leagueId);
+        const league = await this.loadLeague(leagueId, true);
         this.validateLeagueAdmin(userId, league.administrator_id);
 
         const isLeagueMember = await LeagueMember.findOne({
@@ -192,7 +196,7 @@ class LeagueService {
      * @param {number} userId id of person making request (must be league admin)
      */
     static async restorePlayer(playerId, leagueId, userId) {
-        const league = await this.loadLeague(leagueId);
+        const league = await this.loadLeague(leagueId, true);
         this.validateLeagueAdmin(userId, league.administrator_id);
 
         const isLeagueSuspendedMember = await LeagueMember.findOne({
@@ -211,7 +215,7 @@ class LeagueService {
      * @param {number} userId id of person making request (must be league admin)
      */
     static async suspendedPlayersList(leagueId, userId) {
-        const league = await this.loadLeague(leagueId);
+        const league = await this.loadLeague(leagueId, true);
         this.validateLeagueAdmin(userId, league.administrator_id);
 
         const suspended = await LeagueMember.findAll({
@@ -228,12 +232,84 @@ class LeagueService {
     }
 
     /**
+     * Retrieve list of a player's leagues
+     * @param {number} playerId
+     */
+    static async getPlayerLeagues(playerId) {
+        const { current } = await GameweekService.getGameweekState();
+
+        const query = playerLeaguesQuery(playerId, current?.id || 0);
+
+        const leagues = await sequelize.query(query, { type : QueryTypes.SELECT });
+
+        return leagues;
+    }
+
+    /**
+     * Retrieve list of a player's leagues, similar to above but this does not include standings
+     * @param {number} playerId
+     */
+    static async listPlayerLeagues(playerId) {
+        const leagues = await LeagueMember.findAll({
+            where : { player_id : playerId, is_suspended : false },
+            attributes : [[col('League.id'), 'id'], [col('League.name'), 'name'], [col('League.type'), 'type']],
+            include : {
+                model : League,
+                attributes : []
+            },
+            raw : true
+        });
+
+        return leagues;
+    }
+
+    /**
+     * Retrieve a league's standing
+     * @param {number} leagueId
+     * @param {number} page
+     */
+    static async leagueStanding(leagueId, page) {
+        const { current } = await GameweekService.getGameweekState();
+
+        const { id, name, administrator_id, starting_gameweek, type } = await this.loadLeague(leagueId, true);
+
+        const memberCount = await LeagueMember.count({ where : { league_id : leagueId, is_suspended : false }});
+
+        const limit = 20;
+
+        const pages = Math.ceil(memberCount / limit);
+
+        if(page > pages) throw new ServiceError(leagueErrors.INVALID_PAGE);
+
+        const next_page = page + 1 > pages ? null : page + 1;
+
+        const skip = (page - 1) * limit;
+
+        const query = leagueStandingQuery(leagueId, current?.id || 0, skip, limit, starting_gameweek);
+
+        const standing = await sequelize.query(query, { type : QueryTypes.SELECT });
+
+        return { id, name, administrator_id, starting_gameweek, type, standing, next_page, page };
+    }
+
+    /**
+     * Retrieve league details
+     * @param {number} leagueId
+     */
+    static async getLeagueDetails(leagueId) {
+        const league = await this.loadLeague(leagueId);
+        league.invite_code = undefined;
+        return league;
+    }
+
+    /**
      * Load a league by its id
      * @param {number} id
+     * @param {boolean} rawData
      * @returns {object} League details
      */
-    static async loadLeague(id) {
-        const league = await League.findByPk(id);
+    static async loadLeague(id, rawData = false) {
+        const league = await League.findByPk(id, { raw : rawData });
         if(!league) throw new NotFoundError(leagueErrors.LEAGUE_NOT_FOUND);
         return league;
     }
@@ -247,7 +323,7 @@ class LeagueService {
     static validateLeagueAdmin(userId, adminId) {
         if(userId !== adminId){
             throw new ForbiddenError(leagueErrors.LEAGUE_PERMISSION_ERROR);
-        };
+        }
     }
 
     /**

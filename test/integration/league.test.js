@@ -40,7 +40,7 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should fail to create leagues if validation does not pass', (done) => {
             chai.request(server)
             .post('/league')
@@ -53,15 +53,14 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
-    
-    
+
     describe('PUT /league/:leagueId', () => {
         let token = AuthService.generateToken({ id : 1 });
         let tokenAnotherUser = AuthService.generateToken({ id : 2 });
         let leagueUpdates = { name : 'Test League One - Update', max_participants : leaguesMock[0].max_participants + 1, is_closed : true };
         it('should update a league successfully', (done) => {
             chai.request(server)
-            .put('/league/1')
+            .put('/league/3')
             .send(leagueUpdates)
             .set(TOKEN_HEADER, token)
             .then(res => {
@@ -83,11 +82,11 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should open league to new entries successfully', (done) => {
             let newUpdates = { ...leagueUpdates, is_closed : false };
             chai.request(server)
-            .put('/league/1')
+            .put('/league/3')
             .send(newUpdates)
             .set(TOKEN_HEADER, token)
             .then(res => {
@@ -109,10 +108,10 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should return forbidden error if a non-admin tries to update a league', (done) => {
             chai.request(server)
-            .put('/league/1')
+            .put('/league/3')
             .send(leagueUpdates)
             .set(TOKEN_HEADER, tokenAnotherUser)
             .then(res => {
@@ -127,7 +126,7 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should return 404 if league is not found', (done) => {
             chai.request(server)
             .put('/league/999999')
@@ -141,15 +140,50 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
-    
+
+    describe('GET /league/:leagueId', () => {
+        it('should fetch a league successfully', (done) => {
+            chai.request(server)
+            .get('/league/3')
+            .then(res => {
+                expect(res).to.have.status(200);
+                const schema = joi.object({
+                    id: joi.number().integer().required(),
+                    name: joi.string().required(),
+                    max_participants: joi.number().integer().required(),
+                    type: joi.number().integer().valid(LEAGUE_TYPES.general, LEAGUE_TYPES.public, LEAGUE_TYPES.private),
+                    starting_gameweek: joi.number().integer().valid(1).required(),
+                    administrator_id : joi.number().valid(1).required(),
+                    updatedAt: joi.date().required(),
+                    createdAt: joi.date().required(),
+                    is_closed : joi.boolean().required()
+                })
+                joi.assert(res.body.data, schema);
+                done()
+            })
+            .catch(done)
+        })
+
+        it('should return not found error if league is invalid', (done) => {
+            chai.request(server)
+                .get('/league/999999')
+                .then(res => {
+                    expect(res).to.have.status(404);
+                    expect(res.body.message).to.equal(leagueErrors.LEAGUE_NOT_FOUND)
+                    done()
+                })
+                .catch(done)
+        })
+    })
+
     describe('PUT /league/:leagueId/code', () => {
-        
+
         let token = AuthService.generateToken({ id : 1 });
         it('should successfully update a league code.', () => {
             return new Promise(async function (resolve, reject) {
                 const { invite_code : oldCode } = await LeagueService.loadLeague(1);
                 chai.request(server)
-                .put('/league/1/code')
+                .put('/league/3/code')
                 .set(TOKEN_HEADER, token)
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -167,14 +201,14 @@ describe('LEAGUE TESTS', () => {
             })
         })
     })
-    
+
     describe('PUT /league/join', () => {
         let token = AuthService.generateToken({ id : 1 });
         let tokenUserTwo = AuthService.generateToken({ id : 2 });
         let tokenUserThree = AuthService.generateToken({ id : 3 });
         it('join league successfully.', () => {
             return new Promise(async function (resolve, reject) {
-                const { invite_code } = await League.findByPk(1);
+                const { invite_code } = await League.findByPk(3);
                 chai.request(server)
                 .post('/league/join')
                 .send({ invite_code })
@@ -187,7 +221,7 @@ describe('LEAGUE TESTS', () => {
                     const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 1}});
                     if(!userInLeague) {
                         reject(new Error("User not present in league."))
-                    } 
+                    }
                     resolve();
                 })
                 .catch(reject)
@@ -195,7 +229,7 @@ describe('LEAGUE TESTS', () => {
         })
         it('should fail if user is already in the league.', () => {
             return new Promise(async function (resolve, reject) {
-                const { invite_code } = await League.findByPk(1);
+                const { invite_code } = await League.findByPk(3);
                 chai.request(server)
                 .post('/league/join')
                 .send({ invite_code })
@@ -208,7 +242,7 @@ describe('LEAGUE TESTS', () => {
                 .catch(reject)
             })
         })
-    
+
         it('should fail if invite_code is not found.', (done) => {
             chai.request(server)
             .post('/league/join')
@@ -221,7 +255,7 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should fail if invite_code is not provided.', (done) => {
             chai.request(server)
             .post('/league/join')
@@ -233,10 +267,10 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should fail if league is closed to new entries', () => {
             return new Promise(async function (resolve, reject) {
-                const league = await LeagueService.loadLeague(1);
+                const league = await LeagueService.loadLeague(3);
                 league.is_closed = true;
                 await league.save();
                 chai.request(server)
@@ -249,12 +283,12 @@ describe('LEAGUE TESTS', () => {
                     resolve();
                 })
                 .catch(reject)
-            })        
+            })
         })
-    
+
         it('should fail if league is full.', () => {
             return new Promise(async function (resolve, reject) {
-                const league = await LeagueService.loadLeague(1);
+                const league = await LeagueService.loadLeague(3);
                 league.is_closed = false;
                 league.max_participants = 2;
                 await league.save()
@@ -270,14 +304,14 @@ describe('LEAGUE TESTS', () => {
                 .catch(reject)
             })
         })
-    
+
         it('should fail if user is suspended from league', () => {
             return new Promise(async function (resolve, reject) {
-                const { invite_code } = await LeagueService.loadLeague(1);
+                const { invite_code } = await LeagueService.loadLeague(3);
                 await User.create(users[3])
                 await LeagueMember.create({
                     player_id : 3,
-                    league_id : 1,
+                    league_id : 3,
                     is_suspended : true
                 });
                 chai.request(server)
@@ -293,31 +327,121 @@ describe('LEAGUE TESTS', () => {
             })
         })
     })
-    
+
+    describe('GET /league/:leagueId/standing', () => {
+        it('should fetch league standings successfully',(done) => {
+            chai.request(server)
+            .get('/league/3/standing')
+            .then(res => {
+                expect(res).to.have.status(200);
+                const schema = joi.object({
+                    id: joi.number().integer().required(),
+                    name: joi.string().required(),
+                    type: joi.number().integer().valid(LEAGUE_TYPES.general, LEAGUE_TYPES.public, LEAGUE_TYPES.private),
+                    starting_gameweek: joi.number().integer().valid(1).required(),
+                    administrator_id : joi.number().valid(1).required(),
+                    standing : joi.array().items(joi.object({
+                        rank : joi.number().integer().positive().required(),
+                        previous_rank : joi.number().integer().positive().required(),
+                        player_id : joi.number().integer().required(),
+                        username : joi.string().alphanum().min(3).max(30).required(),
+                        full_name : joi.string().min(5).required(),
+                        total_pts : joi.number().integer().positive().allow(null).required(),
+                        round_score : joi.number().integer().positive().allow(null).required(),
+                        total_exact : joi.number().integer().positive().allow(null).required(),
+                        total_close : joi.number().integer().positive().allow(null).required(),
+                        total_outcome : joi.number().integer().positive().allow(null).required(),
+                    })),
+                    next_page : joi.number().integer().allow(null).required(),
+                    page : joi.number().integer().positive().required(),
+                });
+
+                joi.assert(res.body.data, schema);
+
+                done()
+            })
+            .catch(done)
+        })
+
+        it('should return error if user is trying to fetch invalid page',(done) => {
+            chai.request(server)
+            .get('/league/3/standing?page=20000')
+            .then(res => {
+                expect(res).to.have.status(400);
+                expect(res.body.message).to.equal(leagueErrors.INVALID_PAGE);
+                done()
+            })
+            .catch(done)
+        })
+    })
+
+    describe('/league/list/:playerId', () => {
+        it('should retrieve list of player\'s leagues successfully', (done) => {
+            chai.request(server)
+            .get('/league/list/1')
+            .then(res => {
+                expect(res).to.have.status(200);
+                const schema = joi.array().items(joi.object({
+                    player_id : joi.number().integer().required(),
+                    name: joi.string().required(),
+                    player_rank : joi.number().integer().positive().required(),
+                    previous_rank : joi.number().integer().positive().required(),
+                    league_id : joi.number().integer().positive().required(),
+                    type: joi.number().integer().valid(LEAGUE_TYPES.general, LEAGUE_TYPES.public, LEAGUE_TYPES.private),
+                    administrator_id : joi.number().required()
+                }))
+
+                joi.assert(res.body.data, schema);
+
+                done();
+            })
+            .catch(done)
+        })
+    })
+
+    describe('/league/list/:playerId/slim', () => {
+        it('should retrieve slim list of player\'s leagues successfully', (done) => {
+            chai.request(server)
+            .get('/league/list/1/slim')
+            .then(res => {
+                expect(res).to.have.status(200);
+                const schema = joi.array().items(joi.object({
+                    id : joi.number().integer().required(),
+                    name: joi.string().required(),
+                    type: joi.number().integer().valid(LEAGUE_TYPES.general, LEAGUE_TYPES.public, LEAGUE_TYPES.private)
+                }))
+
+                joi.assert(res.body.data, schema);
+
+                done();
+            })
+            .catch(done)
+        })
+    })
+
     describe('PUT /league/:leagueId/leave', () => {
         let token = AuthService.generateToken({ id : 1 })
         let tokenUserTwo = AuthService.generateToken({ id : 2 });
-        let tokenUserThree = AuthService.generateToken({ id : 3 });
         let tokenUserFour = AuthService.generateToken({ id : 4 });
         it('should leave a league successfully', (done) => {
             chai.request(server)
-            .put('/league/1/leave')
+            .put('/league/3/leave')
             .set(TOKEN_HEADER, tokenUserTwo)
             .then(res => {
                 expect(res).to.have.status(200);
                 expect(res.body.message).to.equal(leagueMessages.LEAGUE_EXIT_SUCCESS)
             })
             .then(async () => {
-                const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 1}});
+                const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 3}});
                 if(userInLeague) throw new Error("User still present in league.")
                 done();
             })
             .catch(done)
         })
-    
+
         it('should fail if user is not a participant', (done) => {
             chai.request(server)
-            .put('/league/1/leave')
+            .put('/league/3/leave')
             .set(TOKEN_HEADER, tokenUserFour)
             .then(res => {
                 expect(res).to.have.status(400);
@@ -326,10 +450,10 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should not allow an admin to leave', (done) => {
             chai.request(server)
-            .put('/league/1/leave')
+            .put('/league/3/leave')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(400);
@@ -339,35 +463,36 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
+
     describe('PUT /league/:leagueId/suspend?username={username}', () => {
         let token = AuthService.generateToken({ id : 1 })
         before(async () => {
             await LeagueMember.create({
                 player_id : 2,
-                league_id : 1
+                league_id : 3
             });
         })
-        
-    
+
+
         it('should remove player successfully.', (done) => {
             chai.request(server)
-            .put('/league/1/suspend?username=usernameTwo')
+            .put('/league/3/suspend?username=usernameTwo')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(200);
                 expect(res.body.message).to.equal(leagueMessages.PLAYER_REMOVE_SUCCESS)
             })
             .then(async () => {
-                const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 1}});
-                if(!userInLeague.is_suspended) throw new Error('User did not get suspemded.')
+                const userInLeague = await LeagueMember.findOne({ where : { player_id : 2, league_id : 3}});
+                if(!userInLeague.is_suspended) throw new Error('User did not get suspended.')
                 done();
             })
             .catch(done)
         })
-    
+
         it('should fail if username does not exist', (done) => {
             chai.request(server)
-            .put('/league/1/suspend?username=usernam')
+            .put('/league/3/suspend?username=usernam')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(404)
@@ -375,10 +500,10 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    
+
         it('should fail if player with username is not in league', (done) => {
             chai.request(server)
-            .put('/league/1/suspend?username=usernameTwo')
+            .put('/league/3/suspend?username=usernameTwo')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(404)
@@ -388,12 +513,12 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
-    
+
     describe('PUT /league/:leagueId/restore/:playerId', () => {
         let token = AuthService.generateToken({ id : 1 });
         it('should restore player successfully', (done) => {
             chai.request(server)
-            .put('/league/1/restore/2')
+            .put('/league/3/restore/2')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(200);
@@ -404,7 +529,7 @@ describe('LEAGUE TESTS', () => {
         })
         it('should fail if player is not in suspended league', (done) => {
             chai.request(server)
-            .put('/league/1/restore/4')
+            .put('/league/3/restore/4')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(404);
@@ -414,12 +539,12 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
-    
+
     describe('GET /league/:leagueId/suspended', () => {
         let token = AuthService.generateToken({ id : 1 });
         it('should retrieve list of suspended players.', (done) => {
             chai.request(server)
-            .get('/league/1/suspended')
+            .get('/league/3/suspended')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(200);
@@ -434,12 +559,12 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
     })
-    
+
     describe('DELETE /league/:leagueId', () => {
         let token = AuthService.generateToken({ id : 1 });
         it('should delete league successfully.', (done) => {
             chai.request(server)
-            .delete('/league/1')
+            .delete('/league/3')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(200);
@@ -448,5 +573,5 @@ describe('LEAGUE TESTS', () => {
             })
             .catch(done)
         })
-    })    
+    })
 })

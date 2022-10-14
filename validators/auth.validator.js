@@ -3,7 +3,7 @@ const joi = require('joi');
 const authValidator = {
     registerUserSchema : joi.object({
         fullName : joi.string().min(5).required(),
-        username: joi.string().alphanum().min(3).max(30).required(),
+        username: joi.string().regex(/^[a-zA-Z0-9_]+$/).min(3).max(30).required(),
         email : joi.string().email().required(),
         password : joi.string().min(7).required()
     }),
@@ -11,7 +11,7 @@ const authValidator = {
     loginUserSchema : joi.object({
         password : joi.string().min(7).required(),
         user : joi.alternatives([
-            joi.string().alphanum().min(3),
+            joi.string().regex(/^[a-zA-Z0-9_]+$/).min(3).allow('_'),
             joi.string().email()
         ]).label('username or email').required()
     }),

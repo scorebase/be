@@ -60,7 +60,7 @@ const gameweekController = {
         try {
             const data = await GameweekService.getGameweekState();
             return successResponse(res, GAMEWEEK_STATUS_GET_SUCCESS , data);
-            
+
         } catch (error) {
             next(error);
         }
@@ -71,8 +71,8 @@ const gameweekController = {
             let { next, current } = req.body;
             if(next === 0) next = null;
             if(current === 0) current = null;
-            const data = await GameweekService.updateGameweekState(current, next);
-            return successResponse(res, GAMEWEEK_STATUS_UPDATED_SUCCESS , data);
+            await GameweekService.updateGameweekState(current, next);
+            return successResponse(res, GAMEWEEK_STATUS_UPDATED_SUCCESS, undefined);
         } catch (error) {
             next(error);
         }

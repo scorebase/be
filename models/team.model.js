@@ -17,6 +17,10 @@ Team.init({
         type: DataTypes.STRING,
         allowNull: false,
         comment: 'URL to the team\'s jersey image'
+    },
+    color_code : {
+        type : DataTypes.STRING(10),
+        comment : 'Team color code to display stats on frontend.'
     }
 }, {
     sequelize,

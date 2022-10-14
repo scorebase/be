@@ -2,10 +2,11 @@ const { NotFoundError, ServiceError } = require('../errors/http_errors');
 const { picksErrors, gameweekErrors } = require('../errors');
 const Picks = require('../models/picks.model');
 const PickItem = require('../models/pickItem.model');
-const { Op } = require('sequelize');
+const { Op, literal} = require('sequelize');
 const GameweekService = require('./gameweek.service');
 const FixtureService = require('./fixture.service');
 const sequelize = require('../config/db');
+const UserService = require('./user.service');
 
 const {GAMEWEEK_NOT_FOUND} = gameweekErrors;
 const {
@@ -24,7 +25,7 @@ class PicksService {
 
         if(!gameweekExists) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
 
-        this.deadlinePassed(gameweekExists.deadline);
+        await this.deadlinePassed(gameweekExists.deadline);
 
         const gameweekPickExists = await Picks.findOne({where: { gameweek_id: gameweekExists.id, player_id }});
         if(gameweekPickExists) throw new ServiceError(PICK_ALREADY_EXISTS);
@@ -76,7 +77,7 @@ class PicksService {
         });
         if(!pickExists) throw new NotFoundError(PICK_NOT_FOUND);
 
-        this.deadlinePassed(gameweek.deadline);
+        await this.deadlinePassed(gameweek.deadline);
 
         const { pick_items } = pick;
         const gwFixturesIds = await FixtureService.getCurrentFixturesIds();
@@ -90,14 +91,14 @@ class PicksService {
                     masterFixture = pick_items[i].fixture_id;
                     count++;
                 }
-            };
+            }
             if(count > 1) break;
         }
 
         if(count > 1) throw new ServiceError(MASTER_PICK_GREATER_THAN_ONE);
 
         const masterPick = await PickItem.findOne({ where : { picks_id : pickExists.id, is_master_pick : true }});
-        
+
         if(count === 0) {
             //if no new master_pick is sent, we need to make sure
             //that the master pick fixture is not part of the new update
@@ -130,27 +131,49 @@ class PicksService {
 
     static async getPick(playerId, userId, gameweekId) {
         //get the next gamweek (which a player can make pick for)
-        const { next } = await GameweekService.getGameweekState();
+        const { next, current } = await GameweekService.getGameweekState();
 
         //if gameweek is a future gameweek, throw not found
         if(next && (gameweekId > next.id)) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
 
+        if(current && !next && (gameweekId > current.id)) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
+
         //if another player is trying to get pick of a player and it is for next gameweek, deny access.
         if((+playerId !== userId) && (next && +gameweekId === next.id)) throw new ServiceError(PICK_ACCESS_DENIED);
-            
+        const { user } = await UserService.getProfile(playerId);
+
+        const { full_name : player_name, username : player_username } = user;
+
         const picksData = await Picks.findOne({ where: {
             [Op.and] : [{ player_id: playerId }, { gameweek_id: gameweekId }]
-        }, attributes : {
-            exclude : ['gameweek_id', 'createdAt']
-        }});
-        if(!picksData) return { pick_items : [] };
+        }, attributes : ['id', 'player_id', 'total_points', 'updatedAt', 'exact', 'close', 'result'],
+        raw : true
+        });
+
+        if(!picksData) return { pick_items : [], player_id : playerId,
+            total_points : 0, exact : 0, close: 0, result : 0, player_username, player_name , updatedAt : null };
+
         const pickItemsData = await PickItem.findAll(
             { where: { picks_id: picksData.id },
-                attributes : { exclude : ['picks_id', 'createdAt', 'id'] }
+                attributes : { exclude : ['picks_id', 'createdAt', 'id', 'processed'] }
             });
 
-        const returnedPicksData = { ...picksData.dataValues, pick_items: pickItemsData };
-        return returnedPicksData;
+        return { player_username, player_name, ...picksData, pick_items: pickItemsData };
+    }
+
+    static async getRoundRanks(roundId) {
+        await GameweekService.loadGameweek(roundId);
+
+        const ranks = await Picks.findAll({
+            where : { gameweek_id : roundId },
+            attributes : ['player_id',
+                [literal('RANK() OVER(ORDER BY total_points DESC, exact DESC, `close` DESC, result DESC)'), 'rank']
+            ],
+            order : [['player_id', 'ASC']],
+            raw : true
+        });
+
+        return ranks;
     }
 
     static async deadlinePassed(deadline){

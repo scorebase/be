@@ -4,7 +4,7 @@ const joi = require('joi');
 
 const server = require('../..');
 const { TOKEN_HEADER } = require('../../helpers/constants');
-const { fixtureErrors, teamErrors, gameweekErrors } = require('../../errors');
+const { fixtureErrors, teamErrors } = require('../../errors');
 const { fixtureMessages } = require('../../helpers/messages');
 const AuthService = require('../../services/auth.service');
 
@@ -14,7 +14,7 @@ describe('FIXTURE TESTS', () => {
     describe('POST /fixture', () => {
         it('It should create a fixture if all fields are valid', (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .post('/fixture')
             .set(TOKEN_HEADER, token)
@@ -42,11 +42,11 @@ describe('FIXTURE TESTS', () => {
             })
             .catch(done);
         });
-    
-        it('It should return 400 with response Home Team Id and Away Team Id must be different', 
+
+        it('It should return 400 with response Home Team Id and Away Team Id must be different',
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .post('/fixture')
             .set(TOKEN_HEADER, token)
@@ -64,11 +64,11 @@ describe('FIXTURE TESTS', () => {
             .catch(done);
         });
     });
-    
+
     describe('UPDATE /fixture/:id', () => {
         it('It should successfully update a fixture', (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .put('/fixture/2')
             .set(TOKEN_HEADER, token)
@@ -94,10 +94,10 @@ describe('FIXTURE TESTS', () => {
             })
             .catch(done);
         });
-    
+
         it('It should return 404 with response Fixture not found', (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .put('/fixture/1000000')
             .set(TOKEN_HEADER, token)
@@ -114,11 +114,11 @@ describe('FIXTURE TESTS', () => {
             })
             .catch(done);
         });
-    
-        it('It should return 400 with response Home Team Id and Away Team Id must be different', 
+
+        it('It should return 400 with response Home Team Id and Away Team Id must be different',
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .put('/fixture/2')
             .set(TOKEN_HEADER, token)
@@ -136,11 +136,11 @@ describe('FIXTURE TESTS', () => {
             .catch(done);
         });
     });
-    
+
     describe('/GET /fixture/all/:gameweekId', () => {
         it('It should successfully get all fixtures for that gameweek', (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .get('/fixture/all/1')
             .set(TOKEN_HEADER, token)
@@ -163,12 +163,14 @@ describe('FIXTURE TESTS', () => {
                         home_team: joi.object({
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
-                            jersey: joi.string().valid()
+                            jersey: joi.string().valid(),
+                            color_code : joi.string().required()
                         }),
                         away_team: joi.object({
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
-                            jersey: joi.string().valid()
+                            jersey: joi.string().valid(),
+                            color_code : joi.string().required()
                         })
                     })
                 })
@@ -178,12 +180,12 @@ describe('FIXTURE TESTS', () => {
             .catch(done);
         });
     });
-    
+
     describe('/GET /fixture/all/headtohead?teamOne={teamOneId}&teamTwo={teamTwoId}', () => {
-        it('It should successfully get last 10 head to head fixtures between the two teams', 
+        it('It should successfully get last 10 head to head fixtures between the two teams',
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .get('/fixture/all/headtohead?teamOne=1&teamTwo=4')
             .set(TOKEN_HEADER, token)
@@ -206,12 +208,14 @@ describe('FIXTURE TESTS', () => {
                         home_team: joi.object({
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
-                            jersey: joi.string().valid()
+                            jersey: joi.string().valid(),
+                            color_code : joi.string().required()
                         }),
                         away_team: joi.object({
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
-                            jersey: joi.string().valid()
+                            jersey: joi.string().valid(),
+                            color_code : joi.string().required()
                         })
                     })
                 })
@@ -221,12 +225,12 @@ describe('FIXTURE TESTS', () => {
             .catch(done);
         });
     });
-    
+
     describe('/GET /fixture/all/recent/:teamId?last={last}', () => {
-        it('It should successfully get last {last} fixtures of a tem', 
+        it('It should successfully get last {last} fixtures of a tem',
         (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .get('/fixture/all/recent/1?last=5')
             .set(TOKEN_HEADER, token)
@@ -249,12 +253,14 @@ describe('FIXTURE TESTS', () => {
                         home_team: joi.object({
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
-                            jersey: joi.string().valid()
+                            jersey: joi.string().valid(),
+                            color_code : joi.string().required()
                         }),
                         away_team: joi.object({
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
-                            jersey: joi.string().valid()
+                            jersey: joi.string().valid(),
+                            color_code : joi.string().required()
                         })
                     })
                 })
@@ -264,11 +270,11 @@ describe('FIXTURE TESTS', () => {
             .catch(done);
         });
     });
-    
+
     describe('DELETE /fixture/:id', () => {
         it('It should successfully delete a fixture', (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .delete('/fixture/2')
             .set(TOKEN_HEADER, token)
@@ -284,10 +290,10 @@ describe('FIXTURE TESTS', () => {
             })
             .catch(done);
         });
-    
+
         it('It should return status code 404 with response Fixture not found', (done) => {
             let token = AuthService.generateToken({ id : 1 });
-    
+
             chai.request(server)
             .delete('/fixture/1000000')
             .set(TOKEN_HEADER, token)

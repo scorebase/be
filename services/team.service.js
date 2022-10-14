@@ -17,10 +17,11 @@ class teamService {
      * @param {string} name the team's name
      * @param {string} short_name team's short name like ARS for arsenal
      * @param {string} jersey image url for the team's jersey
+     * @param {string} color_code Color code for team
      * @return {object} team object with the created team name, short_name, jersey
      */
 
-    static async createATeam(name, short_name, jersey) {
+    static async createATeam(name, short_name, jersey, color_code) {
         const teamExists = await Team.findOne({ where: { [Op.or]: [{ name }, { short_name }, { jersey }]}});
 
         if(teamExists){
@@ -37,7 +38,7 @@ class teamService {
         }
 
         const team = await Team.create({
-            name, short_name, jersey
+            name, short_name, jersey, color_code
         });
 
         return team;
@@ -59,10 +60,7 @@ class teamService {
     }
 
     /**
-     * @param {number} teamId the team's id
-     * @param {string} name the team's name
-     * @param {string} short_name team's short name like ARS for arsenal
-     * @param {string} jersey image url for the team's jersey
+     * @param {object} team Team update object
      * @return {object} team object with the created team name, short_name, jersey
      */
 

@@ -15,9 +15,12 @@ leagueRouter.post('/', validateBody(createLeagueSchema), isLoggedIn, LeagueContr
 
 leagueRouter.route('/:leagueId')
     .put(validateBody(updateLeagueSchema), isLoggedIn, LeagueController.updateLeague)
-    .delete(isLoggedIn, LeagueController.deleteLeague);
+    .delete(isLoggedIn, LeagueController.deleteLeague)
+    .get(LeagueController.leagueDetails);
 
 leagueRouter.put('/:leagueId/code', isLoggedIn, LeagueController.regenerateLeagueCode);
+
+leagueRouter.get('/:leagueId/standing', LeagueController.leagueStanding);
 
 leagueRouter.post('/join', validateBody(joinLeagueSchema), isLoggedIn, LeagueController.joinLeague);
 
@@ -27,5 +30,9 @@ leagueRouter.put('/:leagueId/suspend', validateQuery(removePlayerSchema), isLogg
 leagueRouter.put('/:leagueId/restore/:playerId', isLoggedIn, LeagueController.restorePlayer);
 
 leagueRouter.get('/:leagueId/suspended', isLoggedIn, LeagueController.getLeagueSuspendedPlayers);
+
+leagueRouter.get('/list/:playerId', LeagueController.getPlayerLeagues);
+
+leagueRouter.get('/list/:playerId/slim', LeagueController.getLatestPlayerLeaguesWithoutStandings);
 
 module.exports = leagueRouter;

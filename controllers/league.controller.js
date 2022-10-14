@@ -16,6 +16,16 @@ const LeagueController = {
         }
     },
 
+    async leagueDetails(req, res, next) {
+        try{
+            const data = await LeagueService.getLeagueDetails(req.params.leagueId);
+
+            return successResponse(res, leagueMessages.LEAGUE_LIST_SUCCESS ,data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
     async updateLeague(req, res, next) {
         try {
             const { name, max_participants, is_closed } = req.body;
@@ -101,6 +111,36 @@ const LeagueController = {
 
             return successResponse(res, leagueMessages.SUSPENDED_LIST_SUCCESS, data);
         } catch (error) {
+            next(error);
+        }
+    },
+
+    async getPlayerLeagues(req, res, next) {
+        try{
+            const data = await LeagueService.getPlayerLeagues(req.params.playerId);
+
+            return successResponse(res, leagueMessages.LEAGUE_LIST_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async getLatestPlayerLeaguesWithoutStandings(req, res, next) {
+        try{
+            const data = await LeagueService.listPlayerLeagues(req.params.playerId);
+
+            return successResponse(res, leagueMessages.LEAGUE_LIST_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async leagueStanding(req, res, next) {
+        try {
+            const data = await LeagueService.leagueStanding(req.params.leagueId, +req.query.page || 1);
+
+            return successResponse(res, leagueMessages.LEAGUE_LIST_SUCCESS, data);
+        } catch(error) {
             next(error);
         }
     }

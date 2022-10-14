@@ -35,13 +35,13 @@ class FixtureService {
         if(!fixtureExists) throw new NotFoundError(FIXTURE_NOT_FOUND);
 
         if(fixture.home_team_id === fixture.away_team_id) throw new ServiceError(UNIQUE_IDS);
-    
+
         const create_date_time = new Date(fixture.date_time);
-    
+
         fixture.date_time = create_date_time;
-    
+
         await Fixture.update(fixture, {where: {id: fixture.id}});
-    
+
         return fixture;
     }
 
@@ -51,12 +51,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey', 'color_code']
             }
             ]
         });
@@ -75,12 +75,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey', 'color_code']
             }
             ]
         });
@@ -104,12 +104,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['name', 'short_name', 'jersey', 'color_code']
             }
             ]
         });

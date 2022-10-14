@@ -16,6 +16,7 @@ const joi = require('joi');
 const logger = require('../../logger');
 const GameWeekState = require('../../models/gameweek_state.model');
 const LeagueType = require('../../models/league_types.model');
+const League = require('../../models/league.model');
 
 
 chai.use(chaiHttp)
@@ -41,6 +42,24 @@ before(async () => {
             { name : 'public' },
             { name : 'private' }
         ]);
+        await League.bulkCreate([
+            {
+                name : "General",
+                max_participants : 500000,
+                type : 1,
+                starting_gameweek : "1",
+                invite_code : 'a',
+                id: 1
+            },
+            {
+                name : "Gameweek 1",
+                max_participants : 500000,
+                type : 1,
+                starting_gameweek : "1",
+                invite_code : 'ap',
+                id: 2
+            }
+        ]);
 });
 
 describe("Sample Test /", () => {
@@ -54,7 +73,7 @@ describe("Sample Test /", () => {
                     name : joi.string().required().equal('scorebase')
                 })
             });
-    
+
             joi.assert(res.body, schema);
         })
     });

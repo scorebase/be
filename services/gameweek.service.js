@@ -5,6 +5,7 @@ const { ServiceError, NotFoundError } = require('../errors/http_errors');
 const { gameweekErrors } = require('../errors/index');
 const GameWeekState = require('../models/gameweek_state.model');
 const sequelize = require('../config/db');
+const User = require('../models/user.model');
 
 const {
     GAMEWEEK_NOT_FOUND,
@@ -35,7 +36,7 @@ class GameweekService {
         }
 
         const gameweek = await Gameweek.create({ deadline: deadlineDate, title });
-        
+
         return gameweek;
     }
 
@@ -131,11 +132,13 @@ class GameweekService {
                 attributes : ['id', 'deadline', 'title']
             }
         });
+        const season_total_players = await User.count();
 
         const data = { current : null, next : null };
         states.forEach(s => {
             data[s.state] = s.gameweek;
         });
+        data.total_players = season_total_players;
 
         return data;
     }
@@ -160,13 +163,11 @@ class GameweekService {
             });
 
             await t.commit();
-
-            return;
         } catch(error) {
             await t.rollback();
             throw error;
         }
     }
-};
+}
 
 module.exports = GameweekService;
