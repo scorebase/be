@@ -54,7 +54,8 @@ class StatsService {
                 [literal('COUNT(IF(home_pick = away_pick, 1, NULL))'), 'draws']
             ],
             where : { fixture_id : fixtureIds },
-            group : 'fixture_id'
+            group : 'fixture_id',
+            raw : true
         });
 
         return {

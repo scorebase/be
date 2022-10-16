@@ -159,7 +159,8 @@ describe('LEAGUE TESTS', () => {
                     is_closed : joi.number().integer().min(0).max(1).required(),
                     invite_code : joi.string().allow(null).required(),
                     members : joi.array().items({
-                        name : joi.string().required()
+                        name : joi.string().required(),
+                        id : joi.number().integer()
                     })
                 })
                 joi.assert(res.body.data, schema);
@@ -469,7 +470,7 @@ describe('LEAGUE TESTS', () => {
         })
     })
 
-    describe('PUT /league/:leagueId/suspend?username={username}', () => {
+    describe('PUT /league/:leagueId/:playerId', () => {
         let token = AuthService.generateToken({ id : 1 })
         before(async () => {
             await LeagueMember.create({
@@ -481,7 +482,7 @@ describe('LEAGUE TESTS', () => {
 
         it('should remove player successfully.', (done) => {
             chai.request(server)
-            .put('/league/3/suspend?username=usernameTwo')
+            .put('/league/3/suspend/2')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(200);
@@ -495,9 +496,9 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
 
-        it('should fail if username does not exist', (done) => {
+        it('should fail if user does not exist', (done) => {
             chai.request(server)
-            .put('/league/3/suspend?username=usernam')
+            .put('/league/3/suspend/567')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(404)
@@ -506,9 +507,9 @@ describe('LEAGUE TESTS', () => {
             .catch(done)
         })
 
-        it('should fail if player with username is not in league', (done) => {
+        it('should fail if player is not in league', (done) => {
             chai.request(server)
-            .put('/league/3/suspend?username=usernameTwo')
+            .put('/league/3/suspend/2')
             .set(TOKEN_HEADER, token)
             .then(res => {
                 expect(res).to.have.status(404)

@@ -139,11 +139,7 @@ class PicksService {
 
         if(current && !next && (gameweekId > current.id)) throw new NotFoundError(GAMEWEEK_NOT_FOUND);
 
-        //if another player is trying to get pick of a player and it is for next gameweek, deny access.
-        if((+playerId !== userId) && (next && +gameweekId === next.id)) throw new ServiceError(PICK_ACCESS_DENIED);
-        const { user } = await UserService.getProfile(playerId);
-
-        const { full_name : player_name, username : player_username } = user;
+        const { full_name : player_name, username : player_username } = await UserService.getProfile(playerId);
 
         const picksData = await Picks.findOne({ where: {
             [Op.and] : [{ player_id: playerId }, { gameweek_id: gameweekId }]
@@ -156,7 +152,8 @@ class PicksService {
 
         const pickItemsData = await PickItem.findAll(
             { where: { picks_id: picksData.id },
-                attributes : { exclude : ['picks_id', 'createdAt', 'id', 'processed'] }
+                attributes : { exclude : ['picks_id', 'createdAt', 'id', 'processed'] },
+                raw : true
             });
 
         return { player_username, player_name, ...picksData, pick_items: pickItemsData };

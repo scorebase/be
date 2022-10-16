@@ -9,6 +9,7 @@ const { playerLeaguesQuery, leagueStandingQuery} = require('../helpers/query/lea
 const {QueryTypes, col} = require('sequelize');
 const GameweekService = require('./gameweek.service');
 const User = require('../models/user.model');
+const CacheService = require('./cache.service');
 
 const alphabet = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 class LeagueService {
@@ -150,7 +151,6 @@ class LeagueService {
             type : league.type,
             administrator_id : league.administrator_id };
 
-        //do not return anything. User will only get a success message.
         return data;
     }
     /**
@@ -302,7 +302,7 @@ class LeagueService {
         const members = await LeagueMember.findAll({
             where : { league_id : league.id, is_suspended : false },
             raw : true,
-            attributes : [[col('player.username'), 'name']],
+            attributes : [[col('player.username'), 'name'], [col('player.id'), 'id']],
             include : {
                 model : User,
                 as : 'player',
@@ -342,8 +342,16 @@ class LeagueService {
      * @returns {object} League details
      */
     static async loadLeague(id, rawData = false) {
+        const cache = new CacheService('league');
+        if(rawData) {
+            const cached = cache.load(id);
+            if(cached) return cached;
+        }
+
         const league = await League.findByPk(id, { raw : rawData });
         if(!league) throw new NotFoundError(leagueErrors.LEAGUE_NOT_FOUND);
+
+        if(rawData) cache.insert(id, league);
         return league;
     }
 

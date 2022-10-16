@@ -15,6 +15,7 @@ const seasonRouter = require('./routes/season.route');
 const gameweekRouter = require('./routes/gameweek.route');
 const leagueRouter = require('./routes/league.route');
 const statsRouter = require('./routes/stats.route');
+const cacheRouter = require('./routes/cache.route');
 
 const server = express();
 
@@ -41,6 +42,7 @@ server.use('/season', seasonRouter);
 server.use('/gameweek', gameweekRouter);
 server.use('/league', leagueRouter);
 server.use('/stats', statsRouter);
+server.use('/cache', cacheRouter);
 
 //Handle all errors
 /* eslint-disable */

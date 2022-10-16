@@ -6,6 +6,8 @@ const { gameweekErrors } = require('../errors/index');
 const GameWeekState = require('../models/gameweek_state.model');
 const sequelize = require('../config/db');
 const User = require('../models/user.model');
+const CacheService = require('./cache.service');
+const cache = new CacheService('gw');
 
 const {
     GAMEWEEK_NOT_FOUND,
@@ -45,7 +47,10 @@ class GameweekService {
      * @returns {object} data containing requested gameweek
      */
     static async loadGameweek(gameweekId) {
-        const gameweek = await Gameweek.findByPk(gameweekId, {attributes : ['id', 'title', 'deadline']});
+        const cached = cache.load(gameweekId);
+        if(cached) return cached;
+        const gameweek = await Gameweek.findByPk(gameweekId, {attributes : ['id', 'title', 'deadline'], raw : true });
+        cache.insert(gameweekId);
         if(!gameweek){
             throw new NotFoundError(GAMEWEEK_NOT_FOUND);
         }
@@ -115,7 +120,7 @@ class GameweekService {
      * @returns array of all gameweeks
      */
     static async getAllGameweeks() {
-        const gameweeks = await Gameweek.findAll({ attributes : ['id', 'title']});
+        const gameweeks = await Gameweek.findAll({ attributes : ['id', 'title'], raw : true});
 
         return gameweeks;
     }
@@ -125,6 +130,8 @@ class GameweekService {
      * @returns {array} the game states
      */
     static async getGameweekState() {
+        const cached = cache.load('state');
+        if(cached) return cached;
         const states = await GameWeekState.findAll({
             include : {
                 model : Gameweek,
@@ -136,10 +143,11 @@ class GameweekService {
 
         const data = { current : null, next : null };
         states.forEach(s => {
-            data[s.state] = s.gameweek;
+            data[s.state] = s.gameweek?.toJSON() || null;
         });
         data.total_players = season_total_players;
 
+        cache.insert('state', data);
         return data;
     }
 

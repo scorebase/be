@@ -157,7 +157,7 @@ describe('FIXTURE TESTS', () => {
                         home_score: joi.required(),
                         date_time: joi.date().required(),
                         gameweek_id: joi.number().integer().required(),
-                        is_complete: joi.bool().required(),
+                        is_complete: joi.number().integer().required(),
                         updatedAt: joi.date().required(),
                         createdAt: joi.date().required(),
                         home_team: joi.object({

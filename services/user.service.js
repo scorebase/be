@@ -1,22 +1,26 @@
 const User = require('../models/user.model');
 const { NotFoundError} = require('../errors/http_errors');
 const {userErrors } = require('../errors');
+const CacheService = require('./cache.service');
+const cache = new CacheService('user');
 
 const {USER_NOT_FOUND} = userErrors;
 
 class UserService {
     static async getProfile(id) {
-        const user = await User.findByPk(id);
+        const cached = cache.load(id);
+        if(cached) return cached;
+
+        const user = await User.findByPk(id, { raw : true });
+        console.log(user);
         if(!user) throw new NotFoundError(USER_NOT_FOUND);
 
         //delete password_hash from response
         user.password = undefined;
 
-        const data = {
-            user
-        };
+        cache.insert(id, user);
 
-        return data;
+        return user;
     }
 
     static async loadByUserName(username) {
@@ -25,10 +29,10 @@ class UserService {
 
         //delete password_hash from response
         user.password = undefined;
-        
+
         return user;
     }
 
-};
+}
 
 module.exports = UserService;
