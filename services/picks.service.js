@@ -7,6 +7,7 @@ const GameweekService = require('./gameweek.service');
 const FixtureService = require('./fixture.service');
 const sequelize = require('../config/db');
 const UserService = require('./user.service');
+const CacheService = require('./cache.service');
 
 const {GAMEWEEK_NOT_FOUND} = gameweekErrors;
 const {
@@ -160,6 +161,10 @@ class PicksService {
     }
 
     static async getRoundRanks(roundId) {
+        const cache = new CacheService('pick');
+        const key = 'round_ranks_' + roundId;
+        const cached = cache.load(key);
+        if(cached) return cached;
         await GameweekService.loadGameweek(roundId);
 
         const ranks = await Picks.findAll({
@@ -170,7 +175,7 @@ class PicksService {
             order : [['player_id', 'ASC']],
             raw : true
         });
-
+        cache.insert(key, ranks);
         return ranks;
     }
 
