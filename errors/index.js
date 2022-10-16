@@ -52,7 +52,8 @@ module.exports = {
         SUSPENDED_FROM_LEAGUE : 'You have been suspended from this league.',
         PLAYER_NOT_IN_SUSPENDED_LIST : 'Player is not in the list of suspended players.',
         ADMIN_NO_LEAVE : 'You cannot leave this league. Change the administrator to leave',
-        INVALID_PAGE : 'Invalid page number'
+        INVALID_PAGE : 'Invalid page number',
+        ADMIN_REMOVE_SELF : 'You cannot remove yourself.'
     },
     statsErrors : {
         STAT_ACCESS_DENIED : 'Stats cannot be viewed.'
