@@ -8,6 +8,7 @@ const LeagueMember = require('../models/league_member.model');
 const { playerLeaguesQuery, leagueStandingQuery} = require('../helpers/query/league.query');
 const {QueryTypes, col} = require('sequelize');
 const GameweekService = require('./gameweek.service');
+const User = require('../models/user.model');
 
 const alphabet = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 class LeagueService {
@@ -297,9 +298,41 @@ class LeagueService {
      * @param {number} leagueId
      */
     static async getLeagueDetails(leagueId) {
-        const league = await this.loadLeague(leagueId);
-        league.invite_code = undefined;
+        const league = await this.loadLeague(leagueId, true);
+        const members = await LeagueMember.findAll({
+            where : { league_id : league.id, is_suspended : false },
+            raw : true,
+            attributes : [[col('player.username'), 'name']],
+            include : {
+                model : User,
+                as : 'player',
+                attributes : []
+            }
+        });
+
+        league.members = members;
+
         return league;
+    }
+
+    /**
+     * Update the admin of a league
+     * @param {number} playerId (id of player to make admin)
+     * @param {number} leagueId
+     * @param {number} userId id of person making request (must be league admin)
+     */
+    static async updateAdmin(playerId, leagueId, userId) {
+        const league = await this.loadLeague(leagueId);
+        this.validateLeagueAdmin(userId, league.administrator_id);
+
+        const isLeagueMember = await LeagueMember.findOne({
+            where : { league_id : leagueId, player_id : playerId }
+        });
+        if(!isLeagueMember || isLeagueMember.is_suspended) throw new NotFoundError(leagueErrors.PLAYER_NOT_IN_LEAGUE);
+
+        league.administrator_id = playerId;
+
+        await league.save();
     }
 
     /**

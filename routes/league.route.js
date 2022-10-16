@@ -1,12 +1,12 @@
 const express = require('express');
 
 const LeagueController = require('../controllers/league.controller');
-const { isLoggedIn } = require('../middlewares/auth.middleware');
+const { isLoggedIn, isAdmin } = require('../middlewares/auth.middleware');
 const { validateBody, validateQuery } = require('../validators');
 const { createLeagueSchema,
     updateLeagueSchema,
     joinLeagueSchema,
-    removePlayerSchema
+    usernameQuerySchema
 } = require('../validators/league.validator');
 
 const leagueRouter = express.Router();
@@ -16,7 +16,7 @@ leagueRouter.post('/', validateBody(createLeagueSchema), isLoggedIn, LeagueContr
 leagueRouter.route('/:leagueId')
     .put(validateBody(updateLeagueSchema), isLoggedIn, LeagueController.updateLeague)
     .delete(isLoggedIn, LeagueController.deleteLeague)
-    .get(LeagueController.leagueDetails);
+    .get(isAdmin, LeagueController.leagueDetails);
 
 leagueRouter.put('/:leagueId/code', isLoggedIn, LeagueController.regenerateLeagueCode);
 
@@ -26,7 +26,7 @@ leagueRouter.post('/join', validateBody(joinLeagueSchema), isLoggedIn, LeagueCon
 
 leagueRouter.put('/:leagueId/leave', isLoggedIn, LeagueController.leaveLeague);
 
-leagueRouter.put('/:leagueId/suspend', validateQuery(removePlayerSchema), isLoggedIn, LeagueController.removePlayer);
+leagueRouter.put('/:leagueId/suspend', validateQuery(usernameQuerySchema), isLoggedIn, LeagueController.removePlayer);
 leagueRouter.put('/:leagueId/restore/:playerId', isLoggedIn, LeagueController.restorePlayer);
 
 leagueRouter.get('/:leagueId/suspended', isLoggedIn, LeagueController.getLeagueSuspendedPlayers);
@@ -34,5 +34,7 @@ leagueRouter.get('/:leagueId/suspended', isLoggedIn, LeagueController.getLeagueS
 leagueRouter.get('/list/:playerId', LeagueController.getPlayerLeagues);
 
 leagueRouter.get('/list/:playerId/slim', LeagueController.getLatestPlayerLeaguesWithoutStandings);
+
+leagueRouter.put('/:leagueId/admin', validateQuery(usernameQuerySchema), isLoggedIn, LeagueController.changeAdmin);
 
 module.exports = leagueRouter;

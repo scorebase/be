@@ -51,12 +51,12 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey', 'color_code']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey', 'color_code']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             }
             ]
         });
@@ -70,17 +70,18 @@ class FixtureService {
                 [Op.or] : [{ home_team_id: teamId }, { away_team_id: teamId }],
                 is_complete : true
             },
+            attributes : ['id', 'date_time', 'home_score', 'away_score'],
             order: [['id', 'DESC']],
             limit: last,
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey', 'color_code']
+                attributes: ['id' ,'name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey', 'color_code']
+                attributes: ['id','name', 'short_name', 'jersey', 'color_code']
             }
             ]
         });
@@ -99,17 +100,18 @@ class FixtureService {
                 ],
                 is_complete : true
             },
+            attributes : ['id', 'date_time', 'home_score', 'away_score'],
             order: [['id', 'DESC']],
             limit: 10,
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey', 'color_code']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey', 'color_code']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             }
             ]
         });

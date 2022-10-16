@@ -6,6 +6,9 @@ module.exports.playerLeaguesQuery = (userId, currentGW) => {
             lg.name,
             lg.administrator_id,
             lg.type,
+            CASE
+                WHEN lg.type = 2 THEN lg.invite_code
+            END AS invite_code,
             RANK() OVER (PARTITION BY lm.league_id 
                 ORDER BY SUM(pks.total_points)  DESC, 
                 SUM(pks.exact) DESC, 

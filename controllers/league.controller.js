@@ -143,6 +143,17 @@ const LeagueController = {
         } catch(error) {
             next(error);
         }
+    },
+
+    async changeAdmin(req, res, next) {
+        try {
+            const { id : playerId }  = await UserService.loadByUserName(req.query.username);
+            const data = await LeagueService.updateAdmin(playerId, req.params.leagueId, req.userId);
+
+            return successResponse(res, leagueMessages.ADMIN_UPDATE_SUCCESS, data);
+        } catch(error) {
+            next(error);
+        }
     }
 };
 

@@ -56,11 +56,11 @@ class PicksService {
             const picksData = await Picks.create({ player_id, gameweek_id }, { transaction : t });
 
             pick_items.forEach(item => item.picks_id = picksData.id);
-            const pickItemsData = await PickItem.bulkCreate(pick_items, { transaction : t });
+
+            await PickItem.bulkCreate(pick_items, { transaction : t });
 
             await t.commit();
 
-            return { ...picksData.dataValues, pick_items: pickItemsData};
         } catch (error) {
             await t.rollback();
             throw error;
@@ -120,8 +120,9 @@ class PicksService {
                     [Op.and] : [{ picks_id : pickExists.id }, { fixture_id: item.fixture_id }]
                 }});
             }
+            pickExists.changed('updatedAt', true);
+            await pickExists.update({ updatedAt : new Date() });
             await t.commit();
-            return pick;
         } catch(err) {
             await t.rollback();
             throw err;

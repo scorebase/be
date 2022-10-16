@@ -50,9 +50,7 @@ describe('Gameweek Test  /gameweek', () => {
                         data: joi.object({
                             id: joi.number().integer().required(),
                             deadline: joi.date().valid(new Date(gameweeks[1].deadline)),
-                            title: joi.string().valid(gameweeks[1].title),
-                            updatedAt: joi.date().required(),
-                            createdAt: joi.date().required(),
+                            title: joi.string().valid(gameweeks[1].title)
                         }),
                     });
                     joi.assert(res.body, schema);

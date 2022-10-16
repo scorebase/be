@@ -161,12 +161,14 @@ describe('FIXTURE TESTS', () => {
                         updatedAt: joi.date().required(),
                         createdAt: joi.date().required(),
                         home_team: joi.object({
+                            id: joi.number().integer().required(),
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
                             jersey: joi.string().valid(),
                             color_code : joi.string().required()
                         }),
                         away_team: joi.object({
+                            id: joi.number().integer().required(),
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
                             jersey: joi.string().valid(),
@@ -196,22 +198,18 @@ describe('FIXTURE TESTS', () => {
                     message: joi.string().valid(fixtureMessages.FIXTURES_FOUND_SUCCESS),
                     data: joi.array().items({
                         id: joi.number().integer().required(),
-                        home_team_id: joi.number().integer().required(),
-                        away_team_id: joi.number().integer().required(),
                         away_score: joi.number().integer().required(),
                         home_score: joi.number().integer().required(),
                         date_time: joi.date().required(),
-                        gameweek_id: joi.number().integer().required(),
-                        is_complete: joi.bool().required(),
-                        updatedAt: joi.date().required(),
-                        createdAt: joi.date().required(),
                         home_team: joi.object({
+                            id: joi.number().integer().required(),
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
                             jersey: joi.string().valid(),
                             color_code : joi.string().required()
                         }),
                         away_team: joi.object({
+                            id: joi.number().integer().required(),
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
                             jersey: joi.string().valid(),
@@ -241,22 +239,18 @@ describe('FIXTURE TESTS', () => {
                     message: joi.string().valid(fixtureMessages.FIXTURES_FOUND_SUCCESS),
                     data: joi.array().items({
                         id: joi.number().integer().required(),
-                        home_team_id: joi.number().integer().required(),
-                        away_team_id: joi.number().integer().required(),
                         away_score: joi.number().integer().required(),
                         home_score: joi.number().integer().required(),
                         date_time: joi.date().required(),
-                        gameweek_id: joi.number().integer().required(),
-                        is_complete: joi.bool().required(),
-                        updatedAt: joi.date().required(),
-                        createdAt: joi.date().required(),
                         home_team: joi.object({
+                            id: joi.number().integer().required(),
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
                             jersey: joi.string().valid(),
                             color_code : joi.string().required()
                         }),
                         away_team: joi.object({
+                            id: joi.number().integer().required(),
                             name: joi.string().valid(),
                             short_name: joi.string().valid(),
                             jersey: joi.string().valid(),

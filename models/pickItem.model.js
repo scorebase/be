@@ -37,6 +37,7 @@ PickItem.init(
     },
     {
         sequelize,
+        timestamps : false,
         modelName: 'PickItem',
         tableName: 'pick_items'
     }

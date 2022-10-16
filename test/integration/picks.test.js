@@ -243,8 +243,7 @@ describe('Picks Tests', () => {
                             fixture_id: joi.number().integer().required(),
                             home_pick: joi.number().integer().required(),
                             away_pick: joi.number().integer().required(),
-                            is_master_pick: joi.bool().required(),
-                            updatedAt: joi.date().required()
+                            is_master_pick: joi.bool().required()
                         })
                     })
                 });

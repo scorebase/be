@@ -156,7 +156,11 @@ describe('LEAGUE TESTS', () => {
                     administrator_id : joi.number().valid(1).required(),
                     updatedAt: joi.date().required(),
                     createdAt: joi.date().required(),
-                    is_closed : joi.boolean().required()
+                    is_closed : joi.number().integer().min(0).max(1).required(),
+                    invite_code : joi.string().allow(null).required(),
+                    members : joi.array().items({
+                        name : joi.string().required()
+                    })
                 })
                 joi.assert(res.body.data, schema);
                 done()
@@ -388,7 +392,8 @@ describe('LEAGUE TESTS', () => {
                     previous_rank : joi.number().integer().positive().required(),
                     league_id : joi.number().integer().positive().required(),
                     type: joi.number().integer().valid(LEAGUE_TYPES.general, LEAGUE_TYPES.public, LEAGUE_TYPES.private),
-                    administrator_id : joi.number().required()
+                    administrator_id : joi.number().required(),
+                    invite_code : joi.string().allow(null).required()
                 }))
 
                 joi.assert(res.body.data, schema);
