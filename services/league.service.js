@@ -180,6 +180,7 @@ class LeagueService {
         const league = await this.loadLeague(leagueId, true);
         this.validateLeagueAdmin(userId, league.administrator_id);
 
+        if(league.administrator_id === +playerId) throw new ServiceError(leagueErrors.ADMIN_REMOVE_SELF);
         const isLeagueMember = await LeagueMember.findOne({
             where : { league_id : leagueId, player_id : playerId }
         });
@@ -309,8 +310,19 @@ class LeagueService {
                 attributes : []
             }
         });
+        const suspended_members = await LeagueMember.findAll({
+            where : { league_id : league.id, is_suspended : true },
+            raw : true,
+            attributes : [[col('player.username'), 'name'], [col('player.id'), 'id']],
+            include : {
+                model : User,
+                as : 'player',
+                attributes : []
+            }
+        });
 
         league.members = members;
+        league.suspended_members = suspended_members;
 
         return league;
     }

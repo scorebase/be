@@ -161,6 +161,10 @@ describe('LEAGUE TESTS', () => {
                     members : joi.array().items({
                         name : joi.string().required(),
                         id : joi.number().integer()
+                    }),
+                    suspended_members : joi.array().items({
+                        name : joi.string().required(),
+                        id : joi.number().integer()
                     })
                 })
                 joi.assert(res.body.data, schema);
