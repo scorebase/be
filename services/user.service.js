@@ -12,7 +12,6 @@ class UserService {
         if(cached) return cached;
 
         const user = await User.findByPk(id, { raw : true });
-        console.log(user);
         if(!user) throw new NotFoundError(USER_NOT_FOUND);
 
         //delete password_hash from response
