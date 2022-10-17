@@ -8,7 +8,8 @@ module.exports = {
         PICK_ALREADY_EXISTS: 'You have made pick already.',
         PICK_NOT_FOUND: 'Pick not found.',
         PICK_ACCESS_DENIED: 'Pick Access Denied.',
-        INVALID_PICKS : 'Picks are invalid.'
+        INVALID_PICKS : 'Picks are invalid.',
+        INVALID_SCORE_UPDATE : 'Scores for this fixture cannot be updated.'
     },
     authErrors : {
         INVALID_CREDENTIALS_ERROR :'Invalid credentials.',
