@@ -13,8 +13,8 @@ const {
 const teamController = {
     async createTeam(req, res, next) {
         try {
-            const { name, short_name, jersey } = req.body;
-            const data = await teamService.createATeam(name, short_name, jersey);
+            const { name, short_name, jersey, color_code } = req.body;
+            const data = await teamService.createATeam(name, short_name, jersey, color_code);
             return successResponse(res, TEAM_CREATED_SUCCESS, data);
         } catch (error) {
             next(error);

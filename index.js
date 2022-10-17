@@ -14,6 +14,8 @@ const teamRouter = require('./routes/team.route');
 const seasonRouter = require('./routes/season.route');
 const gameweekRouter = require('./routes/gameweek.route');
 const leagueRouter = require('./routes/league.route');
+const statsRouter = require('./routes/stats.route');
+const cacheRouter = require('./routes/cache.route');
 
 const server = express();
 
@@ -39,10 +41,12 @@ server.use('/team', teamRouter);
 server.use('/season', seasonRouter);
 server.use('/gameweek', gameweekRouter);
 server.use('/league', leagueRouter);
+server.use('/stats', statsRouter);
+server.use('/cache', cacheRouter);
 
 //Handle all errors
 /* eslint-disable */
-server.use((error, req, res, next) => {
+server.use((error, req, res, _) => {
   if (error && error.error && error.error.isJoi) {
     // joi error
     error.statusCode = 422;

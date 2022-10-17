@@ -19,6 +19,19 @@ const AuthMiddleware = {
             throw new UnauthorizedError(authErrors.INVALID_SESSION);
         }
     },
+
+    optionalLogin(req, res, next) {
+        const token = req.headers[TOKEN_HEADER];
+
+        if(token) {
+            const decoded = jwt.verify(token, config.auth.secret);
+            req.userId = decoded.id;
+        } else {
+            req.userId = null;
+        }
+
+        next();
+    },
     /**
      * A mock isAdmin middleware to block access to normal users to some admin endpoints
      * this just ensures an admin secret is passed in the header

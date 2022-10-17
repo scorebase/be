@@ -12,6 +12,7 @@ LeagueType.init(
     },
     {
         sequelize,
+        timestamps : false,
         modelName: 'LeagueType',
         tableName : 'league_types'
     }

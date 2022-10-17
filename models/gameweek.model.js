@@ -16,6 +16,7 @@ GameWeek.init(
     },
     {
         sequelize,
+        timestamps: false,
         modelName: 'GameWeek',
         tableName: 'gameweeks'
     }

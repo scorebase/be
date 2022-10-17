@@ -46,7 +46,12 @@ module.exports = {
         LEAGUE_DELETE_SUCCESS : 'League has been deleted successfully.',
         PLAYER_REMOVE_SUCCESS : 'Player has been removed from your league.',
         PLAYER_RESTORE_SUCCESS : 'Player has been added back to your league.',
-        SUSPENDED_LIST_SUCCESS : 'Suspended members fetched successfully.'
+        SUSPENDED_LIST_SUCCESS : 'Suspended members fetched successfully.',
+        LEAGUE_LIST_SUCCESS : 'Leagues fetch success.',
+        ADMIN_UPDATE_SUCCESS : 'Admin update success'
+    },
+    statsMessages : {
+        STATS_FETCH_SUCCESS : 'Stats fetch success.'
     }
 };
 

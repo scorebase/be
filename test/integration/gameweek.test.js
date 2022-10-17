@@ -15,7 +15,6 @@ const {
     gameweekErrors
 } = require('../../errors/index');
 const gameweeks = require('../helpers/gameweek.mock');
-const GameWeekState = require('../../models/gameweek_state.model');
 
 const {
     GAMEWEEK_CREATED_SUCCESS,
@@ -51,9 +50,7 @@ describe('Gameweek Test  /gameweek', () => {
                         data: joi.object({
                             id: joi.number().integer().required(),
                             deadline: joi.date().valid(new Date(gameweeks[1].deadline)),
-                            title: joi.string().valid(gameweeks[1].title),
-                            updatedAt: joi.date().required(),
-                            createdAt: joi.date().required(),
+                            title: joi.string().valid(gameweeks[1].title)
                         }),
                     });
                     joi.assert(res.body, schema);
@@ -155,7 +152,7 @@ describe('Gameweek Test  /gameweek', () => {
     describe('PUT /gameweek/:gameweekId', () => {
         it('It should update the gameweek if all fields are valid', (done) => {
             const validToken = AuthService.generateToken({ id: 1 })
-            const gameweek = { ...gameweeks[0], deadline: "2022-09-05", title: gameweeks[3].title }
+            const gameweek = { ...gameweeks[0], deadline: "2052-09-05", title: gameweeks[3].title }
 
             chai.request(server)
             .put('/gameweek/1')
@@ -289,7 +286,8 @@ describe('Gameweek Test  /gameweek', () => {
                                 id : joi.number().integer().positive().required(),
                                 title : joi.string().required(),
                                 deadline : joi.date().required()
-                            }).allow(null).required()
+                            }).allow(null).required(),
+                            total_players : joi.number().integer().required()
                         }),
                     });
                     joi.assert(res.body, schema);

@@ -4,6 +4,7 @@ const { NotFoundError, ServiceError } = require('../errors/http_errors');
 const { fixtureErrors, teamErrors } = require('../errors');
 const { Op } = require('sequelize');
 const GameweekService = require('./gameweek.service');
+const CacheService = require('./cache.service');
 
 const { FIXTURE_NOT_FOUND } = fixtureErrors;
 const { UNIQUE_IDS } = teamErrors;
@@ -11,10 +12,6 @@ const { UNIQUE_IDS } = teamErrors;
 class FixtureService {
     static async createFixture(home_team_id, away_team_id, date_time, gameweek_id) {
         if(home_team_id === away_team_id) throw new ServiceError(UNIQUE_IDS);
-
-        const create_date_time = new Date(date_time);
-
-        date_time = create_date_time;
 
         const fixture = await Fixture.create({home_team_id, away_team_id, date_time, gameweek_id});
 
@@ -25,7 +22,7 @@ class FixtureService {
         const fixtureExists = await Fixture.findByPk(id);
         if(!fixtureExists) throw new NotFoundError(FIXTURE_NOT_FOUND);
 
-        await Fixture.destroy({ where: { id : id }});
+        await Fixture.destroy({ where: { id }});
 
         return null;
     }
@@ -34,15 +31,13 @@ class FixtureService {
         const fixtureExists = await Fixture.findByPk(fixture.id);
         if(!fixtureExists) throw new NotFoundError(FIXTURE_NOT_FOUND);
 
-        if(fixture.home_team_id === fixture.away_team_id) throw new ServiceError(UNIQUE_IDS);
-    
-        const create_date_time = new Date(fixture.date_time);
-    
-        fixture.date_time = create_date_time;
-    
-        await Fixture.update(fixture, {where: {id: fixture.id}});
-    
-        return fixture;
+        if(fixture.home_team_id && (fixture.home_team_id === fixture.away_team_id)){
+            throw new ServiceError(UNIQUE_IDS);
+        }
+
+        await fixtureExists.update(fixture);
+
+        return { ...fixture, gameweek_id : fixture.gameweek_id || fixtureExists.gameweek_id} ;
     }
 
     static async getFixtures(gameweek_id) {
@@ -51,14 +46,16 @@ class FixtureService {
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             }
-            ]
+            ],
+            raw : true,
+            nest : true
         });
 
         return fixtures;
@@ -70,19 +67,22 @@ class FixtureService {
                 [Op.or] : [{ home_team_id: teamId }, { away_team_id: teamId }],
                 is_complete : true
             },
+            attributes : ['id', 'date_time', 'home_score', 'away_score'],
             order: [['id', 'DESC']],
             limit: last,
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['id' ,'name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['id','name', 'short_name', 'jersey', 'color_code']
             }
-            ]
+            ],
+            raw : true,
+            nest : true
         });
 
         return teamRecentFixtures;
@@ -99,19 +99,22 @@ class FixtureService {
                 ],
                 is_complete : true
             },
+            attributes : ['id', 'date_time', 'home_score', 'away_score'],
             order: [['id', 'DESC']],
             limit: 10,
             include : [{
                 model: Team,
                 as: 'home_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             },
             {
                 model: Team,
                 as: 'away_team',
-                attributes: ['name', 'short_name', 'jersey']
+                attributes: ['id', 'name', 'short_name', 'jersey', 'color_code']
             }
-            ]
+            ],
+            raw : true,
+            nest : true
         });
         return teamsHeadToHeadFixtures;
     }
@@ -124,10 +127,16 @@ class FixtureService {
         const { next } = await GameweekService.getGameweekState();
         if(!next) return [];
 
+        const cache = new CacheService('fixture');
+        const key = 'current_ids';
+        const cached = cache.load(key);
+        if(cached) return cached;
+
         const fixtures = await Fixture.findAll({ where : { gameweek_id : next.id }, attributes : ['id'] });
 
         const ids = fixtures.map(fix => fix.id);
 
+        cache.insert(key, ids);
         return ids;
     }
 }

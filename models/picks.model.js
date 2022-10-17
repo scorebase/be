@@ -14,6 +14,21 @@ Picks.init(
         gameweek_id: {
             type: DataTypes.INTEGER
         },
+        exact : {
+            type : DataTypes.INTEGER,
+            defaultValue: 0,
+            comment : 'Number of exact picks'
+        },
+        close : {
+            type : DataTypes.INTEGER,
+            defaultValue: 0,
+            comment: 'Number of close picks'
+        },
+        result : {
+            type : DataTypes.INTEGER,
+            defaultValue: 0,
+            comment : 'Number of correct outcomes'
+        },
         total_points: {
             type: DataTypes.INTEGER,
             defaultValue: 0

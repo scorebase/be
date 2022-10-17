@@ -22,6 +22,7 @@ const AuthController = {
             return successResponse(res, REGISTRATION_SUCCESS, data);
 
         } catch (error) {
+            console.log(error);
             next(error);
         }
     },

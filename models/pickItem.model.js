@@ -19,10 +19,11 @@ PickItem.init(
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        points: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue : 0
+        processed: {
+            type: DataTypes.BOOLEAN,
+            defaultValue : false,
+            comment : 'This is used to indicate that this pick item has been ' +
+                'processed and its points equivalent has been added to its corresponding pick.'
         },
         picks_id: {
             type: DataTypes.INTEGER,
@@ -36,6 +37,7 @@ PickItem.init(
     },
     {
         sequelize,
+        timestamps : false,
         modelName: 'PickItem',
         tableName: 'pick_items'
     }
