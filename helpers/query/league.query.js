@@ -59,7 +59,7 @@ module.exports.leagueStandingQuery = (leagueId, currentGW, skip, limit, starting
              ORDER BY SUM(pks.total_points) DESC,  
              SUM(pks.exact) DESC, 
              SUM(pks.close) DESC, 
-             SUM(pks.result) DESC) 'rank', 
+             SUM(pks.result) DESC) current_rank, 
         RANK() OVER ( 
             ORDER BY p_pks.total_points DESC,  
             p_pks.exact DESC, 
@@ -95,7 +95,7 @@ module.exports.leagueStandingQuery = (leagueId, currentGW, skip, limit, starting
         WHERE lm.league_id = ${leagueId}
         AND lm.is_suspended = 0
         GROUP BY player_id
-        ORDER BY 'rank' ASC, player_id ASC
+        ORDER BY current_rank ASC, player_id ASC
         LIMIT ${limit} OFFSET ${skip};
     `;
 };
