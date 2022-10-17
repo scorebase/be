@@ -350,7 +350,7 @@ describe('LEAGUE TESTS', () => {
                     starting_gameweek: joi.number().integer().valid(1).required(),
                     administrator_id : joi.number().valid(1).required(),
                     standing : joi.array().items(joi.object({
-                        rank : joi.number().integer().positive().required(),
+                        current_rank : joi.number().integer().positive().required(),
                         previous_rank : joi.number().integer().positive().required(),
                         player_id : joi.number().integer().required(),
                         username : joi.string().alphanum().min(3).max(30).required(),
