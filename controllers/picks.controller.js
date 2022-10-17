@@ -54,6 +54,15 @@ const PicksController = {
         } catch(error) {
             next(error);
         }
+    },
+    async updatePickScores(req, res, next) {
+        try{
+            const data = await PicksService.updatePicksScoreForFixture(req.params.fixtureId);
+
+            return successResponse(res, PICK_UPDATE_SUCCESS, data);
+        } catch(error) {
+            next(error);
+        }
     }
 };
 

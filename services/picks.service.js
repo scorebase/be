@@ -8,6 +8,8 @@ const FixtureService = require('./fixture.service');
 const sequelize = require('../config/db');
 const UserService = require('./user.service');
 const CacheService = require('./cache.service');
+const Fixture = require('../models/fixture.model');
+const {calculatePickResult} = require('../helpers/pick.helper');
 
 const {GAMEWEEK_NOT_FOUND} = gameweekErrors;
 const {
@@ -16,7 +18,8 @@ const {
     PICK_ALREADY_EXISTS,
     PICK_NOT_FOUND,
     PICK_ACCESS_DENIED,
-    INVALID_PICKS
+    INVALID_PICKS,
+    INVALID_SCORE_UPDATE
 } = picksErrors;
 
 class PicksService {
@@ -177,6 +180,58 @@ class PicksService {
         });
         cache.insert(key, ranks);
         return ranks;
+    }
+
+    static async updatePicksScoreForFixture(fixtureId) {
+        const fixture = await Fixture.findByPk(fixtureId);
+        if(!fixture || !fixture.is_complete) {
+            throw new ServiceError(INVALID_SCORE_UPDATE);
+        }
+
+        const count = await PickItem.count({ where : { fixture_id : fixtureId, processed : false }});
+        const loops = Math.ceil(count / 100);
+        const failedPickItems = [];
+
+        for(let i = 0; i < loops; i++) {
+            const pick_items = await PickItem.findAll({
+                where : { fixture_id : fixtureId, processed : false },
+                attributes : ['id', 'home_pick', 'away_pick', 'is_master_pick'],
+                limit : 100,
+                offset : 100 * i,
+                include : {
+                    model : Picks,
+                    attributes : ['id', 'total_points', 'close', 'exact', 'result']
+                }
+            });
+
+            for(const item of pick_items) {
+                const t = await sequelize.transaction();
+
+                try {
+                    const {points, type} = calculatePickResult(
+                        item.home_pick || 0,
+                        item.away_pick || 0,
+                        fixture.home_score || 0,
+                        fixture.away_score || 0
+                    );
+
+                    item.Pick.total_points += (item.is_master_pick ? points * 2 : points);
+                    item.Pick[type] += 1;
+
+                    await item.Pick.save({transaction: t});
+                    item.processed = true;
+                    await item.save({transaction: t});
+
+                    await t.commit();
+
+                } catch (e) {
+                    await t.rollback();
+                    failedPickItems.push(item.id);
+                }
+            }
+        }
+
+        return { failed : failedPickItems };
     }
 
     static async deadlinePassed(deadline){
