@@ -10,15 +10,15 @@ module.exports.playerLeaguesQuery = (userId, currentGW) => {
                 WHEN lg.type = 2 THEN lg.invite_code
             END AS invite_code,
             RANK() OVER (PARTITION BY lm.league_id 
-                ORDER BY SUM(pks.total_points)  DESC, 
-                SUM(pks.exact) DESC, 
-                SUM(pks.close) DESC, 
-                SUM(pks.result) DESC) player_rank,
+                ORDER BY IFNULL(SUM(pks.total_points), 0)  DESC, 
+                IFNULL(SUM(pks.exact), 0) DESC, 
+                IFNULL(SUM(pks.close), 0) DESC, 
+                IFNULL(SUM(pks.result), 0) DESC) player_rank,
             RANK() OVER (PARTITION BY lm.league_id 
-                ORDER BY SUM(p_pks.total_points)  DESC, 
-                SUM(p_pks.exact) DESC, 
-                SUM(p_pks.close) DESC, 
-                SUM(p_pks.result) DESC) previous_rank
+                ORDER BY IFNULL(SUM(p_pks.total_points), 0)  DESC, 
+                IFNULL(SUM(p_pks.exact), 0) DESC, 
+                IFNULL(SUM(p_pks.close), 0) DESC, 
+                IFNULL(SUM(p_pks.result), 0) DESC) previous_rank
             FROM league_members AS lm
             INNER JOIN leagues AS lg ON lm.league_id = lg.id
             LEFT OUTER JOIN picks AS pks 
@@ -56,10 +56,10 @@ module.exports.leagueStandingQuery = (leagueId, currentGW, skip, limit, starting
     return `
     SELECT 
         RANK() OVER (
-             ORDER BY SUM(pks.total_points) DESC,  
-             SUM(pks.exact) DESC, 
-             SUM(pks.close) DESC, 
-             SUM(pks.result) DESC) current_rank, 
+             ORDER BY IFNULL(SUM(pks.total_points), 0) DESC,  
+             IFNULL(SUM(pks.exact), 0) DESC, 
+             IFNULL(SUM(pks.close), 0) DESC, 
+             IFNULL(SUM(pks.result), 0) DESC) current_rank, 
         RANK() OVER ( 
             ORDER BY p_pks.total_points DESC,  
             p_pks.exact DESC, 
@@ -68,11 +68,11 @@ module.exports.leagueStandingQuery = (leagueId, currentGW, skip, limit, starting
         lm.player_id, 
         users.username, 
         users.full_name, 
-        SUM(pks.total_points) AS total_pts, 
-        c_picks.total_points AS round_score, 
-        SUM(pks.exact) AS total_exact, 
-        SUM(pks.close) AS total_close, 
-        SUM(pks.result) AS total_outcome
+        IFNULL(SUM(pks.total_points), 0) AS total_pts, 
+        IFNULL(c_picks.total_points, 0) AS round_score, 
+        IFNULL(SUM(pks.exact),0) AS total_exact, 
+        IFNULL(SUM(pks.close),0) AS total_close, 
+        IFNULL(SUM(pks.result),0) AS total_outcome
         FROM league_members AS lm
         LEFT  JOIN picks AS pks ON 
             pks.player_id = lm.player_id AND 
@@ -90,7 +90,8 @@ module.exports.leagueStandingQuery = (leagueId, currentGW, skip, limit, starting
         ) p_pks ON lm.player_id = p_pks.player_id
         LEFT JOIN picks AS c_picks ON 
             c_picks.player_id = lm.player_id AND 
-            c_picks.gameweek_id = ${currentGW}
+            c_picks.gameweek_id = ${currentGW} AND
+            c_picks.gameweek_id >= ${starting_gameweek}
         INNER JOIN users ON users.id = lm.player_id
         WHERE lm.league_id = ${leagueId}
         AND lm.is_suspended = 0
