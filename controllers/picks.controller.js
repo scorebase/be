@@ -15,6 +15,8 @@ const PicksController = {
     async createPick(req, res, next) {
         try {
             const data = await PicksService.createPick(req.body, req.userId);
+            const { next } = await GameweekService.getGameweekState();
+            picksCache.remove(req.userId + '_' + next.id);
             return successResponse(res, PICK_CREATE_SUCCESS, data);
         } catch(error) {
             next(error);
