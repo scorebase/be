@@ -36,7 +36,7 @@ class UserService {
         const user = await User.findByPk(id, { raw : true });
         if(!user) throw new NotFoundError(USER_NOT_FOUND);
 
-        const updatedUser = { fullName : updatedProfile.fullName, username : updatedProfile.username };
+        const updatedUser = { full_name : updatedProfile.full_name, username : updatedProfile.username };
         await user.update(updatedUser);
 
         user.password = undefined;
