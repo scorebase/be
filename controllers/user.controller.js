@@ -10,6 +10,16 @@ const UserController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    async updateUserProfile(req, res, next){
+        try{
+            const data = await UserService.updateUserProfile(req.userId, req.body);
+
+            return successResponse(res, 'User profile updated.', data);
+        }catch(error){
+            next(error);
+        }
     }
 };
 
