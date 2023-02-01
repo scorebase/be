@@ -7,4 +7,6 @@ const userRouter = express.Router();
 
 userRouter.get('/profile', isLoggedIn, UserController.getProfile);
 
+userRouter.put('/updateProfile', isLoggedIn, UserController.updateUserProfile);
+
 module.exports = userRouter;
