@@ -32,7 +32,7 @@ class UserService {
         return user;
     }
 
-    static async UpdateUserProfile(id, updatedProfile){
+    static async updateUserProfile(id, updatedProfile){
         const user = await User.findByPk(id, { raw : true });
         if(!user) throw new NotFoundError(USER_NOT_FOUND);
 
