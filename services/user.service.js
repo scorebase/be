@@ -33,15 +33,13 @@ class UserService {
     }
 
     static async updateUserProfile(id, updatedProfile){
-        const user = await User.findByPk(id, { raw : true });
-        if(!user) throw new NotFoundError(USER_NOT_FOUND);
+        const userExists = await User.findByPk(id);
+        if(!userExists) throw new NotFoundError(USER_NOT_FOUND);
 
-        const updatedUser = { full_name : updatedProfile.full_name, username : updatedProfile.username };
-        await user.update(updatedUser);
+        console.log(userExists);
+        await userExists.update(updatedProfile);
 
-        user.password = undefined;
-
-        return user;
+        return null;
     }
 
 }
