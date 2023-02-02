@@ -75,10 +75,13 @@ class AuthService {
 
             //add them to their round league
             const { next } = await GameweekService.getGameweekState();
-            await LeagueMember.create(
-                { player_id : user.id, league_id : 1 + +next.id },
-                { transaction : t }
-            );
+
+            if(next !== null){
+                await LeagueMember.create(
+                    { player_id : user.id, league_id : 1 + +next.id },
+                    { transaction : t }
+                );
+            }
 
             await t.commit();
             //delete password_hash from response
