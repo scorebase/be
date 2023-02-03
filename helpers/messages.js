@@ -4,6 +4,9 @@ module.exports = {
         LOGIN_SUCCESS :'Login successful.',
         PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.'
     },
+    userMessages : {
+        USER_PROFILE_UPDATE_SUCCESS: 'User profile updated successfully'
+    },
     fixtureMessages : {
         FIXTURE_CREATED_SUCCESS: 'Fixture created successfully',
         FIXTURES_FOUND_SUCCESS: 'Fixtures gotten successfully',
