@@ -36,7 +36,8 @@ class UserService {
         const userExists = await User.findByPk(id);
         if(!userExists) throw new NotFoundError(USER_NOT_FOUND);
 
-        console.log(userExists);
+        //console.log(userExists);
+
         await userExists.update(updatedProfile);
 
         return null;
