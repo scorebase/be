@@ -2,7 +2,9 @@ module.exports = {
     authMessages : {
         REGISTRATION_SUCCESS :'Registration successful.',
         LOGIN_SUCCESS :'Login successful.',
-        PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.'
+        PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.',
+        REGISTER_USER_TOKEN_CREATED_SUCCESS : 'Register user token sent successfully.',
+        REGISTER_USER_TOKEN_VERIFIED_SUCCESS :'Register user token verified successfully.'
     },
     fixtureMessages : {
         FIXTURE_CREATED_SUCCESS: 'Fixture created successfully',

@@ -2,7 +2,13 @@ const { authMessages } = require('../helpers/messages');
 const successResponse = require('../helpers/success_response');
 const AuthService = require('../services/auth.service');
 
-const { PASSWORD_UPDATE_SUCCESS, REGISTRATION_SUCCESS, LOGIN_SUCCESS } = authMessages;
+const {
+    PASSWORD_UPDATE_SUCCESS,
+    REGISTRATION_SUCCESS,
+    LOGIN_SUCCESS,
+    REGISTER_USER_TOKEN_CREATED_SUCCESS,
+    REGISTER_USER_TOKEN_VERIFIED_SUCCESS
+} = authMessages;
 
 const AuthController = {
     async login(req, res, next) {
@@ -19,6 +25,8 @@ const AuthController = {
         try {
             const {fullName, email, username, password } = req.body;
             const data = await AuthService.registerUser(fullName, username, email, password);
+            //call authservice for token
+            await AuthService.createToken(email);
             return successResponse(res, REGISTRATION_SUCCESS, data);
 
         } catch (error) {
@@ -35,6 +43,30 @@ const AuthController = {
             await AuthService.updatePassword(userId, oldPassword, newPassword);
 
             return successResponse(res, PASSWORD_UPDATE_SUCCESS, null);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async createToken(req, res, next) {
+        try {
+            const { email } = req.body;
+
+            await AuthService.createToken(email);
+
+            return successResponse(res, REGISTER_USER_TOKEN_CREATED_SUCCESS, null);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    async verifyToken(req, res, next) {
+        try {
+            const { token, email } = req.body;
+
+            await AuthService.verifyToken(token, email);
+
+            return successResponse(res, REGISTER_USER_TOKEN_VERIFIED_SUCCESS, null);
         } catch (error) {
             next(error);
         }

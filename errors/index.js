@@ -19,7 +19,11 @@ module.exports = {
         INCORRECT_PASSWORD : 'Incorrect password.',
         TOKEN_REQUIRED : 'You need to be logged in to access this functionality.',
         INVALID_SESSION : 'Invalid session.',
-        NOT_PERMITTED : 'You do not have the rights to do perform this action.'
+        NOT_PERMITTED : 'You do not have the rights to do perform this action.',
+        REGISTER_USER_TOKEN_ERROR : 'Register user token not created successfully.',
+        REGISTER_USER_TOKEN_NOT_FOUND : 'Register user token not found.',
+        REGISTER_USER_TOKEN_EXP: 'Register user token expired',
+        REGISTER_USER_TOKEN_INVALID : 'Token not valid for this user.'
     },
     userErrors : {
         USER_NOT_FOUND : 'User not found'
