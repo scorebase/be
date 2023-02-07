@@ -4,6 +4,7 @@ const config = require('./config/config');
 const logger = require('./logger');
 const Sequelize = require('sequelize');
 const sequelize = require('./config/db');
+const Token = require('./models/token.model');
 
 ///routes
 const authRouter = require('./routes/auth.route');
@@ -68,6 +69,7 @@ server.use((error, req, res, _) => {
 server.listen(config.port, async () => {
   try {
     await sequelize.authenticate();
+    await Token.sync();
     logger.info('Connection has been established successfully.');
     logger.info('Server running on PORT ' + config.port);
   } catch (error) {

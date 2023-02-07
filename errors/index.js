@@ -15,6 +15,8 @@ module.exports = {
         INVALID_CREDENTIALS_ERROR :'Invalid credentials.',
         USERNAME_EXISTS_ERROR :'An account already exists with that username. Please choose another.',
         EMAIL_EXISTS_ERROR :'An account already exists with that email address.',
+        EMAIL_NOT_FOUND : 'The email address does not belong to user in our database.',
+        EMAIL_NOT_VERIFIED : 'The email address is not verified.',
         ACCOUNT_NOT_FOUND : 'Account not found.',
         INCORRECT_PASSWORD : 'Incorrect password.',
         TOKEN_REQUIRED : 'You need to be logged in to access this functionality.',
