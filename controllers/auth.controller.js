@@ -38,6 +38,17 @@ const AuthController = {
         } catch (error) {
             next(error);
         }
+    },
+
+    async createResetPasswordToken(req, res, next) {
+        try {
+            const { email } = req.body;
+            const token = await AuthService.getResetPasswordToken(email);
+
+            return successResponse(res, 'Token created successfully', token);
+        }catch (error) {
+            next(error);
+        }
     }
 };
 
