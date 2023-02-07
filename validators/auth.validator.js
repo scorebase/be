@@ -19,6 +19,10 @@ const authValidator = {
     updatePasswordSchema : joi.object({
         oldPassword : joi.string().min(7).required(),
         newPassword : joi.string().disallow(joi.ref('oldPassword')).min(7).required()
+    }),
+
+    getResetPasswordTokenSchema : joi.object({
+        email : joi.string().email().required()
     })
 };
 
