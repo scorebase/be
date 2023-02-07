@@ -157,7 +157,7 @@ class AuthService {
         let registerUserToken = await Token.findOne({ where: { user_id: user.id} });
         if (registerUserToken) {
             registerUserToken.value = token;
-            registerUserToken.expires_at = new Date(Date.now() + 1800000);
+            registerUserToken.expires_at = new Date(Date.now() + (ONE_MINUTE * REGISTER_USER_TOKEN_EXP_TIME));
             await registerUserToken.save();
         } else {
             //create token ans store in db for user
