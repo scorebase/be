@@ -204,7 +204,7 @@ class AuthService {
         user.email_verified = true;
 
         //make token invalid
-        token.expires_at = Date.now() - ONE_MINUTE;
+        token.expires_at = new Date(Date.now() - ONE_MINUTE);
 
         await user.save();
         await token.save();
