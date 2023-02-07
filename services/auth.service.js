@@ -1,7 +1,8 @@
 const { Op } = require('sequelize');
 const jwt = require('jsonwebtoken');
-
+const { customAlphabet } = require('nanoid');
 const User = require('../models/user.model');
+const Token = require('../models/token.model');
 const { NotFoundError, ServiceError, UnauthorizedError } = require('../errors/http_errors');
 const sequelize = require('../config/db');
 const config = require('../config/config');
@@ -10,11 +11,21 @@ const LeagueMember = require('../models/league_member.model');
 const GameweekService = require('./gameweek.service');
 
 const {
+    ONE_MINUTE,
+    RESET_PASSWORD_EXP_TIME,
+    RESET_PASSWORD_TOKEN_LENGTH,
+    TOKEN_TYPES
+} = require('../helpers/constants');
+
+const {
     INVALID_CREDENTIALS_ERROR,
     USERNAME_EXISTS_ERROR,
     EMAIL_EXISTS_ERROR ,
     ACCOUNT_NOT_FOUND,
-    INCORRECT_PASSWORD
+    INCORRECT_PASSWORD,
+    EMAIL_NOT_FOUND,
+    EMAIL_NOT_VERIFIED,
+    RESET_PASSWORD_TOKEN_ERROR
 } = authErrors;
 
 class AuthService {
@@ -116,6 +127,41 @@ class AuthService {
         user.password = new_password;
 
         await user.save();
+    }
+
+    static async getResetPasswordToken(email) {
+        const user = await User.findOne({ where: { email }});
+
+        if(!user) throw new NotFoundError(EMAIL_NOT_FOUND);
+
+        if(!user.email_verified) throw new ServiceError(EMAIL_NOT_VERIFIED);
+
+        const token = this.generateTokenForUse(RESET_PASSWORD_TOKEN_LENGTH);
+
+        const resetPasswordToken = await Token.findOne({ where : { user_id : user.id }});
+        if(resetPasswordToken){
+            resetPasswordToken.value = token;
+            resetPasswordToken.expires_at = new Date( Date.now() + (ONE_MINUTE * RESET_PASSWORD_EXP_TIME));
+            await resetPasswordToken.save();
+        }else{
+            resetPasswordToken = await Token.create({
+                user_id : user.id,
+                value : token,
+                token_type : TOKEN_TYPES.resetPassword,
+                expires_at : new Date( Date.now() + (ONE_MINUTE * RESET_PASSWORD_EXP_TIME))
+            });
+        }
+
+        if(!resetPasswordToken) throw new ServiceError(RESET_PASSWORD_TOKEN_ERROR);
+
+        return token;
+    }
+
+    static generateTokenForUse(length) {
+        const alphanumericChars = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const nanoid = customAlphabet(alphanumericChars, length);
+
+        return nanoid();
     }
 
     /**

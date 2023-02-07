@@ -17,6 +17,7 @@ module.exports = {
         EMAIL_EXISTS_ERROR :'An account already exists with that email address.',
         EMAIL_NOT_FOUND : 'The email address does not belong to user in our database.',
         EMAIL_NOT_VERIFIED : 'The email address is not verified.',
+        RESET_PASSWORD_TOKEN_ERROR : 'Unable to create reset password token for this user.',
         ACCOUNT_NOT_FOUND : 'Account not found.',
         INCORRECT_PASSWORD : 'Incorrect password.',
         TOKEN_REQUIRED : 'You need to be logged in to access this functionality.',
