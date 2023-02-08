@@ -19,6 +19,7 @@ module.exports = {
         EMAIL_NOT_VERIFIED : 'The email address is not verified.',
         RESET_PASSWORD_TOKEN_ERROR : 'Unable to create reset password token for this user.',
         INVALID_TOKEN : 'The token provided by the client does not belong to this user.',
+        TOKEN_NOT_FOUND : 'The token provided by the client does not exist in the database.',
         EXPIRED_TOKEN_ERROR: 'The token provided by the client has expired.',
         ACCOUNT_NOT_FOUND : 'Account not found.',
         INCORRECT_PASSWORD : 'Incorrect password.',

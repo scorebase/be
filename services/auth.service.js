@@ -25,7 +25,10 @@ const {
     INCORRECT_PASSWORD,
     EMAIL_NOT_FOUND,
     EMAIL_NOT_VERIFIED,
-    RESET_PASSWORD_TOKEN_ERROR
+    RESET_PASSWORD_TOKEN_ERROR,
+    INVALID_TOKEN,
+    EXPIRED_TOKEN_ERROR,
+    TOKEN_NOT_FOUND
 } = authErrors;
 
 class AuthService {
@@ -155,6 +158,35 @@ class AuthService {
         if(!resetPasswordToken) throw new ServiceError(RESET_PASSWORD_TOKEN_ERROR);
 
         return token;
+    }
+
+    static async verifyResetPasswordToken(email, token) {
+        const user = await User.findOne({ where : { email }});
+        if(user === null) throw new NotFoundError(EMAIL_NOT_FOUND);
+
+        const tokenEntity = await this.verifyToken(token, user.id, TOKEN_TYPES.resetPassword);
+
+        if(tokenEntity === null) return false;
+
+        // tokenExists.expires_at = new Date( Date.now() - ONE_MINUTE);
+
+        // await tokenExists.save();
+
+        return true;
+    }
+
+    static async verifyToken(token, userId, tokenType) {
+        const tokenExists = await Token.findOne({
+            where: { [Op.and] : [ { value : token }, { token_type : tokenType }]}
+        });
+
+        if(tokenExists === null) throw new NotFoundError(TOKEN_NOT_FOUND);
+
+        if(tokenExists.user_id !== userId) throw new ServiceError(INVALID_TOKEN);
+
+        if(Date.now() > tokenExists.expires_at.getTime()) throw new ServiceError(EXPIRED_TOKEN_ERROR);
+
+        return tokenExists;
     }
 
     static generateTokenForUse(length) {
