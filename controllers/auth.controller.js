@@ -2,7 +2,11 @@ const { authMessages } = require('../helpers/messages');
 const successResponse = require('../helpers/success_response');
 const AuthService = require('../services/auth.service');
 
-const { PASSWORD_UPDATE_SUCCESS, REGISTRATION_SUCCESS, LOGIN_SUCCESS } = authMessages;
+const { PASSWORD_UPDATE_SUCCESS,
+    REGISTRATION_SUCCESS,
+    LOGIN_SUCCESS,
+    TOKEN_VERIFIED_SUCCESS
+} = authMessages;
 
 const AuthController = {
     async login(req, res, next) {
@@ -47,6 +51,18 @@ const AuthController = {
 
             return successResponse(res, 'Token created successfully', token);
         }catch (error) {
+            next(error);
+        }
+    },
+
+    async verifyResetPasswordToken(req, res, next) {
+        try {
+            const { email, token } = req.body;
+
+            const data = await AuthService.verifyResetPasswordToken(email, token);
+
+            return successResponse(res, TOKEN_VERIFIED_SUCCESS, data);
+        }catch(error) {
             next(error);
         }
     }
