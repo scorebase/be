@@ -15,6 +15,8 @@ const authRouter = express.Router();
 authRouter.post('/login', validateBody(loginUserSchema), AuthController.login);
 authRouter.post('/register', validateBody(registerUserSchema), AuthController.register);
 authRouter.put('/password', validateBody(updatePasswordSchema), isLoggedIn, AuthController.updatePassword);
-authRouter.post('/resetPassword', validateBody(getResetPasswordTokenSchema), AuthController.createResetPasswordToken);
+authRouter.post('/resetPasswordToken',
+    validateBody(getResetPasswordTokenSchema),
+    AuthController.createResetPasswordToken);
 
 module.exports = authRouter;
