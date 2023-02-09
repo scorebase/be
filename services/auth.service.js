@@ -141,7 +141,7 @@ class AuthService {
 
         const token = this.generateTokenForUse(RESET_PASSWORD_TOKEN_LENGTH);
 
-        const resetPasswordToken = await Token.findOne({ where : { user_id : user.id }});
+        let resetPasswordToken = await Token.findOne({ where : { user_id : user.id }});
         if(resetPasswordToken){
             resetPasswordToken.value = token;
             resetPasswordToken.expires_at = new Date( Date.now() + (ONE_MINUTE * RESET_PASSWORD_EXP_TIME));
