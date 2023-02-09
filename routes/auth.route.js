@@ -7,7 +7,8 @@ const {
     registerUserSchema,
     loginUserSchema,
     updatePasswordSchema,
-    getResetPasswordTokenSchema
+    getResetPasswordTokenSchema,
+    verifyResetPasswordTokenSchema
 } = require('../validators/auth.validator');
 
 const authRouter = express.Router();
@@ -18,5 +19,9 @@ authRouter.put('/password', validateBody(updatePasswordSchema), isLoggedIn, Auth
 authRouter.post('/resetPasswordToken',
     validateBody(getResetPasswordTokenSchema),
     AuthController.createResetPasswordToken);
+
+authRouter.post('/verifyResetPasswordToken',
+    validateBody(verifyResetPasswordTokenSchema),
+    AuthController.verifyResetPasswordToken);
 
 module.exports = authRouter;
