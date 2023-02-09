@@ -168,11 +168,23 @@ class AuthService {
 
         if(tokenEntity === null) return false;
 
-        // tokenExists.expires_at = new Date( Date.now() - ONE_MINUTE);
-
-        // await tokenExists.save();
-
         return true;
+    }
+
+    static async resetPassword(token, email, newPassword){
+        const user = await User.findOne({ where : { email }});
+        if(user === null) throw new NotFoundError(EMAIL_NOT_FOUND);
+
+        const tokenEntity = await this.verifyToken(token, user.id, TOKEN_TYPES.resetPassword);
+
+        tokenEntity.expires_at = new Date( Date.now() - ONE_MINUTE);
+
+        user.password = newPassword;
+
+        await tokenEntity.save();
+        await user.save();
+
+        return null;
     }
 
     static async verifyToken(token, userId, tokenType) {
