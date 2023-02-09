@@ -3,7 +3,8 @@ module.exports = {
         REGISTRATION_SUCCESS :'Registration successful.',
         LOGIN_SUCCESS :'Login successful.',
         PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.',
-        TOKEN_VERIFIED_SUCCESS : 'The token provided by the client is valid'
+        TOKEN_VERIFIED_SUCCESS : 'The token provided by the client is valid',
+        RESET_PASSWORD_SUCCESS : 'Password reset was successful.'
     },
     fixtureMessages : {
         FIXTURE_CREATED_SUCCESS: 'Fixture created successfully',

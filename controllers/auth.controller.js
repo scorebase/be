@@ -5,7 +5,8 @@ const AuthService = require('../services/auth.service');
 const { PASSWORD_UPDATE_SUCCESS,
     REGISTRATION_SUCCESS,
     LOGIN_SUCCESS,
-    TOKEN_VERIFIED_SUCCESS
+    TOKEN_VERIFIED_SUCCESS,
+    RESET_PASSWORD_SUCCESS
 } = authMessages;
 
 const AuthController = {
@@ -63,6 +64,19 @@ const AuthController = {
 
             return successResponse(res, TOKEN_VERIFIED_SUCCESS, data);
         }catch(error) {
+            next(error);
+        }
+    },
+
+    async resetPassword(req, res, next) {
+        try{
+            const { email, token, new_password } = req.body;
+
+            const data = await AuthService.resetPassword(email, token, new_password);
+
+            return successResponse(res, RESET_PASSWORD_SUCCESS, data);
+
+        } catch (error) {
             next(error);
         }
     }

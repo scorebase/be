@@ -171,7 +171,7 @@ class AuthService {
         return true;
     }
 
-    static async resetPassword(token, email, newPassword){
+    static async resetPassword(email, token, newPassword){
         const user = await User.findOne({ where : { email }});
         if(user === null) throw new NotFoundError(EMAIL_NOT_FOUND);
 
