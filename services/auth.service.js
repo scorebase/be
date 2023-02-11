@@ -17,7 +17,7 @@ const {
     ONE_MINUTE
 } = require('../helpers/constants');
 
-const alphabet = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const alphabet = '0123456789';
 
 const {
     INVALID_CREDENTIALS_ERROR,
@@ -154,7 +154,9 @@ class AuthService {
         const token = this.generateRegisterUserToken();
 
         //find token for a user, if token exists, update token properties else create new token
-        let registerUserToken = await Token.findOne({ where: { user_id: user.id} });
+        let registerUserToken = await Token.findOne({
+            where: { [Op.and] : [{value: inputToken}, {token_type: TOKEN_TYPES.registerUser}] }
+        });
         if (registerUserToken) {
             registerUserToken.value = token;
             registerUserToken.expires_at = new Date(Date.now() + (ONE_MINUTE * REGISTER_USER_TOKEN_EXP_TIME));
