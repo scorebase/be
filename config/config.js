@@ -29,6 +29,9 @@ const config = {
     auth : {
         secret : process.env.JWT_SECRET,
         adminSecret : process.env.ADMIN_SECRET
+    },
+    mail : {
+        api_key : process.env.SENGRID_API_KEY
     }
 };
 

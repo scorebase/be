@@ -52,6 +52,13 @@ module.exports = {
     },
     statsMessages : {
         STATS_FETCH_SUCCESS : 'Stats fetch success.'
+    },
+    emailMessages : {
+        TEMPLATE_CREATE_SUCCESS : 'Template has been created.',
+        TEMPLATE_UPDATE_SUCCESS : 'Template has been updated.',
+        TEMPLATE_FETCH_SUCCESS : 'Templated loaded successfully.',
+        TEMPLATE_DELETE_SUCCESS : 'Templated deleted successfully.',
+        EMAIL_SENT_SUCCESS : 'Email has been sent.'
     }
 };
 
