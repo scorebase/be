@@ -155,7 +155,7 @@ class AuthService {
 
         //find token for a user, if token exists, update token properties else create new token
         let registerUserToken = await Token.findOne({
-            where: { [Op.and] : [{value: inputToken}, {token_type: TOKEN_TYPES.registerUser}] }
+            where: { [Op.and] : [{user_id: user.id}, {token_type: TOKEN_TYPES.registerUser}] }
         });
         if (registerUserToken) {
             registerUserToken.value = token;
