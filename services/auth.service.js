@@ -13,15 +13,11 @@ const {
     REGISTER_USER_TOKEN_LENGTH,
     TOKEN_TYPES,
     REGISTER_USER_TOKEN_EXP_TIME,
-    ONE_MINUTE
-} = require('../helpers/constants');
-
-const {
     ONE_MINUTE,
     RESET_PASSWORD_EXP_TIME,
-    RESET_PASSWORD_TOKEN_LENGTH,
-    TOKEN_TYPES
+    RESET_PASSWORD_TOKEN_LENGTH
 } = require('../helpers/constants');
+
 
 const {
     INVALID_CREDENTIALS_ERROR,
