@@ -8,7 +8,6 @@ const sequelize = require('../config/db');
 const config = require('../config/config');
 const { authErrors } = require('../errors');
 const LeagueMember = require('../models/league_member.model');
-const Token = require('../models/token.model');
 const GameweekService = require('./gameweek.service');
 const {
     REGISTER_USER_TOKEN_LENGTH,
