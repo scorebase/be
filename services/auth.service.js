@@ -8,7 +8,14 @@ const sequelize = require('../config/db');
 const config = require('../config/config');
 const { authErrors } = require('../errors');
 const LeagueMember = require('../models/league_member.model');
+const Token = require('../models/token.model');
 const GameweekService = require('./gameweek.service');
+const {
+    REGISTER_USER_TOKEN_LENGTH,
+    TOKEN_TYPES,
+    REGISTER_USER_TOKEN_EXP_TIME,
+    ONE_MINUTE
+} = require('../helpers/constants');
 
 const {
     ONE_MINUTE,
@@ -28,6 +35,10 @@ const {
     RESET_PASSWORD_TOKEN_ERROR,
     EXPIRED_TOKEN_ERROR,
     TOKEN_NOT_FOUND
+    REGISTER_USER_TOKEN_ERROR,
+    REGISTER_USER_TOKEN_NOT_FOUND,
+    REGISTER_USER_TOKEN_EXP,
+    REGISTER_USER_TOKEN_INVALID
 } = authErrors;
 
 class AuthService {
@@ -215,6 +226,78 @@ class AuthService {
      */
     static generateToken(data) {
         return jwt.sign(data, config.auth.secret);
+    }
+
+    /**
+     *
+     * @param {string} email User email
+     * @returns null. Sends email to user
+    */
+    static async createToken(email) {
+        //find user in database
+        const user = await User.findOne({ where: { email : email } });
+
+        //generate token
+        const token = this.generateRegisterUserToken();
+
+        //find token for a user, if token exists, update token properties else create new token
+        let registerUserToken = await Token.findOne({
+            where: { [Op.and] : [{user_id: user.id}, {token_type: TOKEN_TYPES.registerUser}] }
+        });
+        if (registerUserToken) {
+            registerUserToken.value = token;
+            registerUserToken.expires_at = new Date(Date.now() + (ONE_MINUTE * REGISTER_USER_TOKEN_EXP_TIME));
+            await registerUserToken.save();
+        } else {
+            //create token ans store in db for user
+            //expires in 20 minutes. 1 minute = 60000 milliseconds, 20 minutes = 1200000 milliseconds
+            registerUserToken = await Token.create({
+                user_id: user.id,
+                value: token,
+                token_type: TOKEN_TYPES.registerUser,
+                expires_at: new Date(Date.now() + (ONE_MINUTE * REGISTER_USER_TOKEN_EXP_TIME))
+            });
+
+            if (!registerUserToken) throw new ServiceError(REGISTER_USER_TOKEN_ERROR);
+        }
+
+        //send email to user with token
+    }
+
+    static generateRegisterUserToken() {
+        const alphabet = '0123456789';
+        const nanoid = customAlphabet(alphabet, REGISTER_USER_TOKEN_LENGTH);
+        return nanoid();
+    }
+
+    /**
+     *
+     * @param {string} inputToken Register user token
+     * @param {string} email User email
+     * @returns null
+    */
+    static async verifyToken(inputToken, email) {
+        //find token
+        const token = await Token.findOne({
+            where: { [Op.and] : [{value: inputToken}, {token_type: TOKEN_TYPES.registerUser}] }
+        });
+        if (!token) throw new NotFoundError(REGISTER_USER_TOKEN_NOT_FOUND);
+        
+        //check for expiry
+        if (Date.now() > token.expires_at.getTime()) throw new ServiceError(REGISTER_USER_TOKEN_EXP);
+
+        //check if it belongs to the user
+        const user = await User.findOne({ where: { email: email} });
+        if (user.id !== token.user_id) throw new ServiceError(REGISTER_USER_TOKEN_INVALID);
+
+        //verify the user
+        user.email_verified = true;
+
+        //make token invalid
+        token.expires_at = new Date(Date.now() - ONE_MINUTE);
+
+        await user.save();
+        await token.save();
     }
 }
 

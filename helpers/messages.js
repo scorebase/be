@@ -5,6 +5,8 @@ module.exports = {
         PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.',
         TOKEN_VERIFIED_SUCCESS : 'The token provided by the client is valid',
         RESET_PASSWORD_SUCCESS : 'Password reset was successful.'
+        REGISTER_USER_TOKEN_CREATED_SUCCESS : 'Register user token sent successfully.',
+        REGISTER_USER_TOKEN_VERIFIED_SUCCESS :'Register user token verified successfully.'
     },
     fixtureMessages : {
         FIXTURE_CREATED_SUCCESS: 'Fixture created successfully',
@@ -54,6 +56,13 @@ module.exports = {
     },
     statsMessages : {
         STATS_FETCH_SUCCESS : 'Stats fetch success.'
+    },
+    emailMessages : {
+        TEMPLATE_CREATE_SUCCESS : 'Template has been created.',
+        TEMPLATE_UPDATE_SUCCESS : 'Template has been updated.',
+        TEMPLATE_FETCH_SUCCESS : 'Templated loaded successfully.',
+        TEMPLATE_DELETE_SUCCESS : 'Templated deleted successfully.',
+        EMAIL_SENT_SUCCESS : 'Email has been sent.'
     }
 };
 

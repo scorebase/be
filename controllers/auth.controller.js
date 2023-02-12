@@ -7,6 +7,8 @@ const { PASSWORD_UPDATE_SUCCESS,
     LOGIN_SUCCESS,
     TOKEN_VERIFIED_SUCCESS,
     RESET_PASSWORD_SUCCESS
+    REGISTER_USER_TOKEN_CREATED_SUCCESS,
+    REGISTER_USER_TOKEN_VERIFIED_SUCCESS
 } = authMessages;
 
 const AuthController = {
@@ -24,10 +26,11 @@ const AuthController = {
         try {
             const {fullName, email, username, password } = req.body;
             const data = await AuthService.registerUser(fullName, username, email, password);
+            //call authservice for token
+            await AuthService.createToken(email);
             return successResponse(res, REGISTRATION_SUCCESS, data);
 
         } catch (error) {
-            console.log(error);
             next(error);
         }
     },
@@ -67,6 +70,18 @@ const AuthController = {
             next(error);
         }
     },
+    
+    async createToken(req, res, next) {
+        try {
+            const { email } = req.body;
+
+            await AuthService.createToken(email);
+
+            return successResponse(res, REGISTER_USER_TOKEN_CREATED_SUCCESS, null);
+        } catch (error) {
+            next(error);
+        }
+    },
 
     async resetPassword(req, res, next) {
         try{
@@ -75,7 +90,18 @@ const AuthController = {
             const data = await AuthService.resetPassword(token, newPassword);
 
             return successResponse(res, RESET_PASSWORD_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+    
+    async verifyToken(req, res, next) {
+        try {
+            const { token, email } = req.body;
 
+            await AuthService.verifyToken(token, email);
+
+            return successResponse(res, REGISTER_USER_TOKEN_VERIFIED_SUCCESS, null);
         } catch (error) {
             next(error);
         }

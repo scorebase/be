@@ -1,4 +1,5 @@
 const joi = require('joi');
+const { REGISTER_USER_TOKEN_LENGTH } = require('../helpers/constants');
 
 const authValidator = {
     registerUserSchema : joi.object({
@@ -32,6 +33,13 @@ const authValidator = {
     resetPasswordSchema : joi.object({
         token : joi.string().required(),
         newPassword : joi.string().required()
+    }),
+    createTokenSchema : joi.object({
+        email : joi.string().email().required()
+    }),
+    verifyTokenSchema : joi.object({
+        token : joi.string().length(REGISTER_USER_TOKEN_LENGTH).required(),
+        email : joi.string().email().required()
     })
 };
 

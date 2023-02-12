@@ -10,6 +10,8 @@ const {
     getResetPasswordTokenSchema,
     verifyResetPasswordTokenSchema,
     resetPasswordSchema
+    createTokenSchema,
+    verifyTokenSchema
 } = require('../validators/auth.validator');
 
 const authRouter = express.Router();
@@ -28,5 +30,8 @@ authRouter.post('/verifyResetPasswordToken',
 authRouter.put('/resetPassword',
     validateBody(resetPasswordSchema),
     AuthController.resetPassword);
+    
+authRouter.post('/token', validateBody(createTokenSchema), AuthController.createToken);
+authRouter.post('/token/verify', validateBody(verifyTokenSchema), AuthController.verifyToken);
 
 module.exports = authRouter;

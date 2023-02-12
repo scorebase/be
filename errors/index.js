@@ -9,7 +9,8 @@ module.exports = {
         PICK_NOT_FOUND: 'Pick not found.',
         PICK_ACCESS_DENIED: 'Pick Access Denied.',
         INVALID_PICKS : 'Picks are invalid.',
-        INVALID_SCORE_UPDATE : 'Scores for this fixture cannot be updated.'
+        INVALID_SCORE_UPDATE : 'Scores for this fixture cannot be updated.',
+        DEADLINE_PASSED : 'Round deadline has passed.'
     },
     authErrors : {
         INVALID_CREDENTIALS_ERROR :'Invalid credentials.',
@@ -25,7 +26,11 @@ module.exports = {
         INCORRECT_PASSWORD : 'Incorrect password.',
         TOKEN_REQUIRED : 'You need to be logged in to access this functionality.',
         INVALID_SESSION : 'Invalid session.',
-        NOT_PERMITTED : 'You do not have the rights to do perform this action.'
+        NOT_PERMITTED : 'You do not have the rights to do perform this action.',
+        REGISTER_USER_TOKEN_ERROR : 'Register user token not created successfully.',
+        REGISTER_USER_TOKEN_NOT_FOUND : 'Register user token not found.',
+        REGISTER_USER_TOKEN_EXP: 'Register user token expired',
+        REGISTER_USER_TOKEN_INVALID : 'Token not valid for this user.'
     },
     userErrors : {
         USER_NOT_FOUND : 'User not found'
@@ -64,5 +69,11 @@ module.exports = {
     },
     statsErrors : {
         STAT_ACCESS_DENIED : 'Stats cannot be viewed.'
+    },
+    emailErrors: {
+        NAME_ALREADY_EXISTS : 'A template with that name already exists.',
+        TEMPLATE_NOT_FOUND : 'Template not found.',
+        SENDGRID_MAIL_ERROR : 'There was an issue while sending the mail. Please try again.',
+        SENDER_ID_REQUIRED : 'A sender name and email is required.'
     }
 };

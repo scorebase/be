@@ -1,6 +1,7 @@
 module.exports.playerLeaguesQuery = (userId, currentGW) => {
     return `
-           WITH cte AS (
+        SELECT c.*, p.player_rank AS previous_rank 
+        FROM (
             SELECT lm.player_id, 
             league_id, 
             lg.name,
@@ -13,42 +14,40 @@ module.exports.playerLeaguesQuery = (userId, currentGW) => {
                 ORDER BY IFNULL(SUM(pks.total_points), 0)  DESC, 
                 IFNULL(SUM(pks.exact), 0) DESC, 
                 IFNULL(SUM(pks.close), 0) DESC, 
-                IFNULL(SUM(pks.result), 0) DESC) player_rank,
-            RANK() OVER (PARTITION BY lm.league_id 
-                ORDER BY IFNULL(SUM(p_pks.total_points), 0)  DESC, 
-                IFNULL(SUM(p_pks.exact), 0) DESC, 
-                IFNULL(SUM(p_pks.close), 0) DESC, 
-                IFNULL(SUM(p_pks.result), 0) DESC) previous_rank
+                IFNULL(SUM(pks.result), 0) DESC) player_rank
             FROM league_members AS lm
             INNER JOIN leagues AS lg ON lm.league_id = lg.id
             LEFT OUTER JOIN picks AS pks 
             ON pks.player_id = lm.player_id AND 
             pks.gameweek_id >= lg.starting_gameweek
             
-            LEFT JOIN (
-                SELECT 
-                SUM(total_points) total_points, 
-                SUM(exact) exact, 
-                SUM('close') 'close', 
-                SUM(result) result, 
-                p_pks.player_id FROM picks AS p_pks 
-                INNER JOIN league_members lm ON lm.player_id = p_pks.player_id
-                INNER JOIN leagues AS lg ON lm.league_id = lg.id
-                
-                WHERE 
-                p_pks.gameweek_id < ${currentGW} AND 
-                p_pks.gameweek_id >= lg.starting_gameweek
-                
-                GROUP BY p_pks.player_id
-            ) p_pks ON lm.player_id = p_pks.player_id
-            
-            
             WHERE lm.is_suspended = 0
             GROUP BY lm.player_id, lm.league_id
             ORDER BY league_id ASC, lm.player_id ASC
-        )
-
-        SELECT * FROM cte WHERE player_id = ${userId};
+        ) AS c
+        INNER JOIN (
+        	SELECT * FROM (
+                SELECT
+                league_id,
+                lm.player_id,
+                RANK() OVER (PARTITION BY lm.league_id 
+                    ORDER BY IFNULL(SUM(pks.total_points), 0)  DESC, 
+                    IFNULL(SUM(pks.exact), 0) DESC, 
+                    IFNULL(SUM(pks.close), 0) DESC, 
+                    IFNULL(SUM(pks.result), 0) DESC) player_rank
+                FROM league_members AS lm
+                INNER JOIN leagues AS lg ON lm.league_id = lg.id
+                LEFT OUTER JOIN picks AS pks 
+                ON pks.player_id = lm.player_id AND 
+                pks.gameweek_id >= lg.starting_gameweek AND pks.gameweek_id < ${currentGW}
+                WHERE lm.is_suspended = 0
+                GROUP BY lm.player_id, lm.league_id
+                ORDER BY league_id ASC, lm.player_id ASC
+            ) AS pr
+			WHERE pr.player_id = ${userId}
+        ) p ON p.league_id = c.league_id
+        
+		WHERE c.player_id = ${userId};
     `;
 };
 
