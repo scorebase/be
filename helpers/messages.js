@@ -4,7 +4,7 @@ module.exports = {
         LOGIN_SUCCESS :'Login successful.',
         PASSWORD_UPDATE_SUCCESS : 'Password updated successfully.',
         TOKEN_VERIFIED_SUCCESS : 'The token provided by the client is valid',
-        RESET_PASSWORD_SUCCESS : 'Password reset was successful.'
+        RESET_PASSWORD_SUCCESS : 'Password reset was successful.',
         REGISTER_USER_TOKEN_CREATED_SUCCESS : 'Register user token sent successfully.',
         REGISTER_USER_TOKEN_VERIFIED_SUCCESS :'Register user token verified successfully.'
     },
