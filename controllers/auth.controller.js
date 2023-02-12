@@ -58,9 +58,9 @@ const AuthController = {
 
     async verifyResetPasswordToken(req, res, next) {
         try {
-            const { email, token } = req.body;
+            const { token } = req.body;
 
-            const data = await AuthService.verifyResetPasswordToken(email, token);
+            const data = await AuthService.verifyResetPasswordToken(token);
 
             return successResponse(res, TOKEN_VERIFIED_SUCCESS, data);
         }catch(error) {
@@ -70,9 +70,9 @@ const AuthController = {
 
     async resetPassword(req, res, next) {
         try{
-            const { email, token, newPassword } = req.body;
+            const { token, newPassword } = req.body;
 
-            const data = await AuthService.resetPassword(email, token, newPassword);
+            const data = await AuthService.resetPassword(token, newPassword);
 
             return successResponse(res, RESET_PASSWORD_SUCCESS, data);
 

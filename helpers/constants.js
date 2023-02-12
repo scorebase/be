@@ -6,7 +6,7 @@ module.exports.TOKEN_TYPES = {
     resetPassword: 'RESET_PASSWORD'
 };
 
-module.exports.RESET_PASSWORD_TOKEN_LENGTH = 8;
+module.exports.RESET_PASSWORD_TOKEN_LENGTH = 30;
 
 module.exports.RESET_PASSWORD_EXP_TIME = 15;
 
