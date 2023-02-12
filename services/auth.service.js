@@ -142,7 +142,7 @@ class AuthService {
 
         let resetPasswordToken = await Token.findOne({
             where : {
-                user_id : user.id, token_type : TOKEN_TYPES.resetPassword
+                [Op.and] : [{user_id : user.id}, {token_type : TOKEN_TYPES.resetPassword}]
             }});
         if(resetPasswordToken){
             resetPasswordToken.value = token;
