@@ -26,12 +26,10 @@ const authValidator = {
     }),
 
     verifyResetPasswordTokenSchema : joi.object({
-        email : joi.string().email().required(),
         token : joi.string().required()
     }),
 
     resetPasswordSchema : joi.object({
-        email : joi.string().email().required(),
         token : joi.string().required(),
         newPassword : joi.string().required()
     })
