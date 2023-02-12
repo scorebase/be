@@ -4,7 +4,6 @@ const config = require('./config/config');
 const logger = require('./logger');
 const Sequelize = require('sequelize');
 const sequelize = require('./config/db');
-const Token = require('./models/token.model');
 
 ///routes
 const authRouter = require('./routes/auth.route');
