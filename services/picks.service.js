@@ -17,7 +17,7 @@ const {
     MASTER_PICK_GREATER_THAN_ONE,
     PICK_ALREADY_EXISTS,
     PICK_NOT_FOUND,
-    PICK_ACCESS_DENIED,
+    DEADLINE_PASSED,
     INVALID_PICKS,
     INVALID_SCORE_UPDATE
 } = picksErrors;
@@ -236,7 +236,7 @@ class PicksService {
 
     static async deadlinePassed(deadline){
         if(new Date().getTime() >= new Date(deadline).getTime())
-            throw new ServiceError(PICK_ACCESS_DENIED);
+            throw new ServiceError(DEADLINE_PASSED);
     }
 }
 

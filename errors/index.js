@@ -9,7 +9,8 @@ module.exports = {
         PICK_NOT_FOUND: 'Pick not found.',
         PICK_ACCESS_DENIED: 'Pick Access Denied.',
         INVALID_PICKS : 'Picks are invalid.',
-        INVALID_SCORE_UPDATE : 'Scores for this fixture cannot be updated.'
+        INVALID_SCORE_UPDATE : 'Scores for this fixture cannot be updated.',
+        DEADLINE_PASSED : 'Round deadline has passed.'
     },
     authErrors : {
         INVALID_CREDENTIALS_ERROR :'Invalid credentials.',
@@ -62,5 +63,11 @@ module.exports = {
     },
     statsErrors : {
         STAT_ACCESS_DENIED : 'Stats cannot be viewed.'
+    },
+    emailErrors: {
+        NAME_ALREADY_EXISTS : 'A template with that name already exists.',
+        TEMPLATE_NOT_FOUND : 'Template not found.',
+        SENDGRID_MAIL_ERROR : 'There was an issue while sending the mail. Please try again.',
+        SENDER_ID_REQUIRED : 'A sender name and email is required.'
     }
 };
