@@ -26,7 +26,6 @@ const {
     EMAIL_NOT_FOUND,
     EMAIL_NOT_VERIFIED,
     RESET_PASSWORD_TOKEN_ERROR,
-    INVALID_TOKEN,
     EXPIRED_TOKEN_ERROR,
     TOKEN_NOT_FOUND
 } = authErrors;
@@ -141,7 +140,10 @@ class AuthService {
 
         const token = this.generateTokenForUse(RESET_PASSWORD_TOKEN_LENGTH);
 
-        let resetPasswordToken = await Token.findOne({ where : { user_id : user.id, token_type : TOKEN_TYPES.resetPassword }});
+        let resetPasswordToken = await Token.findOne({
+            where : {
+                user_id : user.id, token_type : TOKEN_TYPES.resetPassword
+            }});
         if(resetPasswordToken){
             resetPasswordToken.value = token;
             resetPasswordToken.expires_at = new Date( Date.now() + (ONE_MINUTE * RESET_PASSWORD_EXP_TIME));
@@ -160,24 +162,24 @@ class AuthService {
         return token;
     }
 
-    static async verifyResetPasswordToken(email, token) {
-        const user = await User.findOne({ where : { email }});
-        if(user === null) throw new NotFoundError(EMAIL_NOT_FOUND);
+    static async verifyResetPasswordToken(token) {
+        const tokenEntity = await this.verifyToken(token, TOKEN_TYPES.resetPassword);
 
-        const tokenEntity = await this.verifyToken(token, user.id, TOKEN_TYPES.resetPassword);
+        const tokenToReturn = {
+            token : tokenEntity.value,
+            verified : true
+        };
 
-        if(tokenEntity === null) return false;
-
-        return true;
+        return tokenToReturn;
     }
 
-    static async resetPassword(email, token, newPassword){
-        const user = await User.findOne({ where : { email }});
-        if(user === null) throw new NotFoundError(EMAIL_NOT_FOUND);
-
-        const tokenEntity = await this.verifyToken(token, user.id, TOKEN_TYPES.resetPassword);
+    static async resetPassword(token, newPassword){
+        const tokenEntity = await this.verifyToken(token, TOKEN_TYPES.resetPassword);
 
         tokenEntity.expires_at = new Date( Date.now() - ONE_MINUTE);
+
+        const user = await User.findByPk(tokenEntity.user_id);
+        if(user === null) throw new NotFoundError(EMAIL_NOT_FOUND);
 
         user.password = newPassword;
 
@@ -187,14 +189,12 @@ class AuthService {
         return null;
     }
 
-    static async verifyToken(token, userId, tokenType) {
+    static async verifyToken(token, tokenType) {
         const tokenExists = await Token.findOne({
             where: { [Op.and] : [ { value : token }, { token_type : tokenType }]}
         });
 
         if(tokenExists === null) throw new NotFoundError(TOKEN_NOT_FOUND);
-
-        if(tokenExists.user_id !== userId) throw new ServiceError(INVALID_TOKEN);
 
         if(Date.now() > tokenExists.expires_at.getTime()) throw new ServiceError(EXPIRED_TOKEN_ERROR);
 
