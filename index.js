@@ -69,7 +69,6 @@ server.use((error, req, res, _) => {
 server.listen(config.port, async () => {
   try {
     await sequelize.authenticate();
-    await Token.sync();
     logger.info('Connection has been established successfully.');
     logger.info('Server running on PORT ' + config.port);
   } catch (error) {
