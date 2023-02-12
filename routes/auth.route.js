@@ -9,7 +9,7 @@ const {
     updatePasswordSchema,
     getResetPasswordTokenSchema,
     verifyResetPasswordTokenSchema,
-    resetPasswordSchema
+    resetPasswordSchema,
     createTokenSchema,
     verifyTokenSchema
 } = require('../validators/auth.validator');
