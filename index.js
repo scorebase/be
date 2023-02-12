@@ -56,11 +56,11 @@ server.use((error, req, res, _) => {
   } else if(error instanceof Sequelize.BaseError) {
     //dont show sequelize error to users, log the error for debugging purpose
     logger.error(`
-      Seqelize error occured on url ${req.originalUrl}
+      Sequelize error occurred on url ${req.originalUrl}
       with request body : ${JSON.stringify(req.body) || null}
       with error ${error.message}
     `);
-    error.message = 'Unknown error occured.'
+    error.message = 'Unknown error occurred.'
   }
   return res
     .status(error.statusCode || 500)

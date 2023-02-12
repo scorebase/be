@@ -2,10 +2,11 @@ const { authMessages } = require('../helpers/messages');
 const successResponse = require('../helpers/success_response');
 const AuthService = require('../services/auth.service');
 
-const {
-    PASSWORD_UPDATE_SUCCESS,
+const { PASSWORD_UPDATE_SUCCESS,
     REGISTRATION_SUCCESS,
     LOGIN_SUCCESS,
+    TOKEN_VERIFIED_SUCCESS,
+    RESET_PASSWORD_SUCCESS
     REGISTER_USER_TOKEN_CREATED_SUCCESS,
     REGISTER_USER_TOKEN_VERIFIED_SUCCESS
 } = authMessages;
@@ -30,7 +31,6 @@ const AuthController = {
             return successResponse(res, REGISTRATION_SUCCESS, data);
 
         } catch (error) {
-            console.log(error);
             next(error);
         }
     },
@@ -48,6 +48,29 @@ const AuthController = {
         }
     },
 
+    async createResetPasswordToken(req, res, next) {
+        try {
+            const { email } = req.body;
+            const token = await AuthService.getResetPasswordToken(email);
+
+            return successResponse(res, 'Token created successfully', token);
+        }catch (error) {
+            next(error);
+        }
+    },
+
+    async verifyResetPasswordToken(req, res, next) {
+        try {
+            const { token } = req.body;
+
+            const data = await AuthService.verifyResetPasswordToken(token);
+
+            return successResponse(res, TOKEN_VERIFIED_SUCCESS, data);
+        }catch(error) {
+            next(error);
+        }
+    },
+    
     async createToken(req, res, next) {
         try {
             const { email } = req.body;
@@ -60,6 +83,18 @@ const AuthController = {
         }
     },
 
+    async resetPassword(req, res, next) {
+        try{
+            const { token, newPassword } = req.body;
+
+            const data = await AuthService.resetPassword(token, newPassword);
+
+            return successResponse(res, RESET_PASSWORD_SUCCESS, data);
+        } catch (error) {
+            next(error);
+        }
+    },
+    
     async verifyToken(req, res, next) {
         try {
             const { token, email } = req.body;
