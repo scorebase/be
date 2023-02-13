@@ -2,8 +2,8 @@ const joi = require('joi');
 
 const userValidator = {
     updateUserProfileSchema : joi.object({
-        full_name : joi.string(),
-        username : joi.string()
+        full_name : joi.string().required(),
+        username : joi.string().required()
     })
 };
 

@@ -17,8 +17,6 @@ const UserController = {
         try{
             const data = await UserService.updateUserProfile(req.userId, req.body);
 
-            console.log(data);
-
             return successResponse(res, userMessages.USER_PROFILE_UPDATE_SUCCESS, data);
         }catch(error){
             next(error);
