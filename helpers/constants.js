@@ -11,6 +11,8 @@ module.exports.RESET_PASSWORD_TOKEN_LENGTH = 30;
 
 module.exports.RESET_PASSWORD_EXP_TIME = 15;
 
+module.exports.RESET_PASSWORD_TEMPLATE_NAME = 'reset_password';
+
 module.exports.ONE_MINUTE = 60000;
 
 module.exports.LEAGUE_TYPES = {general : 1, public : 2, private : 3};

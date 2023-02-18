@@ -18,7 +18,6 @@ const {
     RESET_PASSWORD_TOKEN_LENGTH
 } = require('../helpers/constants');
 
-
 const {
     INVALID_CREDENTIALS_ERROR,
     USERNAME_EXISTS_ERROR,
@@ -26,7 +25,6 @@ const {
     ACCOUNT_NOT_FOUND,
     INCORRECT_PASSWORD,
     EMAIL_NOT_FOUND,
-    EMAIL_NOT_VERIFIED,
     RESET_PASSWORD_TOKEN_ERROR,
     EXPIRED_TOKEN_ERROR,
     TOKEN_NOT_FOUND,
@@ -94,11 +92,13 @@ class AuthService {
 
             //add them to their round league
             const { next } = await GameweekService.getGameweekState();
-            await LeagueMember.create(
-                { player_id : user.id, league_id : 1 + +next.id },
-                { transaction : t }
-            );
+            if(next !== null){
+                await LeagueMember.create(
+                    { player_id : user.id, league_id : 1 + +next.id },
+                    { transaction : t }
+                );
 
+            }
             await t.commit();
             //delete password_hash from response
             user.password = undefined;
@@ -142,8 +142,6 @@ class AuthService {
 
         if(!user) throw new NotFoundError(EMAIL_NOT_FOUND);
 
-        if(!user.email_verified) throw new ServiceError(EMAIL_NOT_VERIFIED);
-
         const token = this.generateTokenForUse(RESET_PASSWORD_TOKEN_LENGTH);
 
         let resetPasswordToken = await Token.findOne({
@@ -165,11 +163,13 @@ class AuthService {
 
         if(!resetPasswordToken) throw new ServiceError(RESET_PASSWORD_TOKEN_ERROR);
 
-        return token;
+        const userData = { username : user.username, token};
+
+        return userData;
     }
 
     static async verifyResetPasswordToken(token) {
-        const tokenEntity = await this.verifyToken(token, TOKEN_TYPES.resetPassword);
+        const tokenEntity = await this.verifyTokenInDb(token, TOKEN_TYPES.resetPassword);
 
         const tokenToReturn = {
             token : tokenEntity.value,
@@ -180,7 +180,7 @@ class AuthService {
     }
 
     static async resetPassword(token, newPassword){
-        const tokenEntity = await this.verifyToken(token, TOKEN_TYPES.resetPassword);
+        const tokenEntity = await this.verifyTokenInDb(token, TOKEN_TYPES.resetPassword);
 
         tokenEntity.expires_at = new Date( Date.now() - ONE_MINUTE);
 
@@ -195,7 +195,7 @@ class AuthService {
         return null;
     }
 
-    static async verifyToken(token, tokenType) {
+    static async verifyTokenInDb(token, tokenType) {
         const tokenExists = await Token.findOne({
             where: { [Op.and] : [ { value : token }, { token_type : tokenType }]}
         });

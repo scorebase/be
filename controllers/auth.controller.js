@@ -1,11 +1,15 @@
 const { authMessages } = require('../helpers/messages');
 const successResponse = require('../helpers/success_response');
 const AuthService = require('../services/auth.service');
+const EmailService = require('../services/email.service');
+
+const { RESET_PASSWORD_TEMPLATE_NAME } = require('../helpers/constants');
 
 const { PASSWORD_UPDATE_SUCCESS,
     REGISTRATION_SUCCESS,
     LOGIN_SUCCESS,
     TOKEN_VERIFIED_SUCCESS,
+    TOKEN_CREATED_SUCCESS,
     RESET_PASSWORD_SUCCESS,
     REGISTER_USER_TOKEN_CREATED_SUCCESS,
     REGISTER_USER_TOKEN_VERIFIED_SUCCESS
@@ -51,9 +55,11 @@ const AuthController = {
     async createResetPasswordToken(req, res, next) {
         try {
             const { email } = req.body;
-            const token = await AuthService.getResetPasswordToken(email);
+            const userData = await AuthService.getResetPasswordToken(email);
 
-            return successResponse(res, 'Token created successfully', token);
+            await EmailService.sendEmail(RESET_PASSWORD_TEMPLATE_NAME, email, userData);
+
+            return successResponse(res, TOKEN_CREATED_SUCCESS, null);
         }catch (error) {
             next(error);
         }
