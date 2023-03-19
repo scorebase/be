@@ -76,6 +76,8 @@ const gameweekController = {
             if(current === 0) current = null;
             await GameweekService.updateGameweekState(current, next);
             gwCache.remove('state');
+            //Schedule Reminder
+            await GameweekService.scheduleReminder(next);
             return successResponse(res, GAMEWEEK_STATUS_UPDATED_SUCCESS, undefined);
         } catch (error) {
             next(error);
