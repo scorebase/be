@@ -4,7 +4,7 @@ const config = require('../config/config');
 const Gameweek = require('../models/gameweek.model');
 
 const { ServiceError, NotFoundError } = require('../errors/http_errors');
-const { gameweekErrors } = require('../errors/index');
+const { gameweekErrors, agendaErrors } = require('../errors/index');
 const GameWeekState = require('../models/gameweek_state.model');
 const sequelize = require('../config/db');
 const User = require('../models/user.model');
@@ -21,7 +21,7 @@ const {
 } = gameweekErrors;
 
 const {
-    PICKS_REMINDER, ONE_HOUR
+    PICKS_REMINDER, THREE_HOURS
 } = require('../helpers/constants');
 
 class GameweekService {
@@ -181,9 +181,6 @@ class GameweekService {
 
             await t.commit();
 
-            //Schedule Reminder
-            await this.scheduleReminder(nextGw);
-
         } catch(error) {
             await t.rollback();
             throw error;
@@ -204,13 +201,15 @@ class GameweekService {
             const agenda = new Agenda({ db: { address: config.mongo.connection_string}});
 
             //scehdule reminder to happen one hour before 'nextGw''s deadline
-            await agenda.schedule(gameweek.deadline - (ONE_HOUR), 'schedule reminder', { nextGw: nextGw });
+            await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'schedule reminder', { nextGw: nextGw });
         } catch(error) {
             //Log Agenda error.
             logger.error(
-                `Error scheduling Gameweek ${nextGw} reminder. 
+                `Error scheduling Gameweek ${nextGw} reminder. Please try again.
                 Error body : ${JSON.stringify(error.response.body)}`
             );
+            //Throw more friendly error to client
+            throw new ServiceError(agendaErrors.SCHEDULE_ERROR);
         }
         
     }

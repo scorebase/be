@@ -20,7 +20,7 @@ module.exports.startAgenda = async() => {
     } catch(error) {
         //Log Agenda error.
         logger.error(
-            `Error Connecting to Mongodb and calling schedule. 
+            `Error Connecting to Mongodb and calling schedule. Please try again. 
             Error body : ${JSON.stringify(error.response)}`
         );
     }
