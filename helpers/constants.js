@@ -25,4 +25,8 @@ module.exports.LEAGUE_CODE_LENGTH = 7;
 
 module.exports.MAX_LEAGUES_PER_PLAYER = 20; //maximum number of leagues a player can participate in.
 
+module.exports.REGISTER_USER_MAIL = 'register_user';
+
+module.exports.WELCOME_USER_MAIL = 'welcome_user';
+
 module.exports.PICKS_REMINDER= 'picks_reminder';

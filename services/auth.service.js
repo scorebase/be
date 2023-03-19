@@ -9,15 +9,18 @@ const config = require('../config/config');
 const { authErrors } = require('../errors');
 const LeagueMember = require('../models/league_member.model');
 const GameweekService = require('./gameweek.service');
+const EmailService = require('./email.service');
+
 const {
     REGISTER_USER_TOKEN_LENGTH,
     TOKEN_TYPES,
     REGISTER_USER_TOKEN_EXP_TIME,
     ONE_MINUTE,
     RESET_PASSWORD_EXP_TIME,
-    RESET_PASSWORD_TOKEN_LENGTH
+    RESET_PASSWORD_TOKEN_LENGTH,
+    REGISTER_USER_MAIL,
+    WELCOME_USER_MAIL
 } = require('../helpers/constants');
-
 
 const {
     INVALID_CREDENTIALS_ERROR,
@@ -257,6 +260,7 @@ class AuthService {
         }
 
         //send email to user with token
+        await EmailService.sendEmail(REGISTER_USER_MAIL, email, { token: token });
     }
 
     static generateRegisterUserToken() {
@@ -293,6 +297,8 @@ class AuthService {
 
         await user.save();
         await token.save();
+
+        await EmailService.sendEmail(WELCOME_USER_MAIL, email, { name: user.full_name });
     }
 }
 
