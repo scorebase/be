@@ -1,19 +1,28 @@
-const { Op } = require('sequelize');
+const { Op, QueryTypes } = require('sequelize');
+const { Agenda }= require('@hokify/agenda');
+const config = require('../config/config');
 const Gameweek = require('../models/gameweek.model');
 
 const { ServiceError, NotFoundError } = require('../errors/http_errors');
-const { gameweekErrors } = require('../errors/index');
+const { gameweekErrors, agendaErrors } = require('../errors/index');
 const GameWeekState = require('../models/gameweek_state.model');
 const sequelize = require('../config/db');
 const User = require('../models/user.model');
 const CacheService = require('./cache.service');
+const EmailService = require('./email.service');
+const { picksNotMadeQuery } = require('../helpers/query/gameweek.query');
 const cache = new CacheService('gw');
+const logger = require('../logger');
 
 const {
     GAMEWEEK_NOT_FOUND,
     GAMEWEEK_TITLE_EXISTS,
     GAMEWEEK_DEADLINE_ERROR
 } = gameweekErrors;
+
+const {
+    PICKS_REMINDER, THREE_HOURS
+} = require('../helpers/constants');
 
 class GameweekService {
 
@@ -171,10 +180,95 @@ class GameweekService {
             });
 
             await t.commit();
+
         } catch(error) {
             await t.rollback();
             throw error;
         }
+    }
+
+    /**
+     * schedules picks reminder for next gameweek
+     * @param {int} nextGw The next gameweek
+     * @returns {void}
+     */
+    static async scheduleReminder(nextGw) {
+        //query Gameweek table to get gameweek details
+        const gameweek = await Gameweek.findByPk(nextGw);
+
+        try {
+            //create and Agenda instance and connect to the agenda server
+            const agenda = new Agenda({ db: { address: config.mongo.connection_string}});
+
+            //scehdule reminder to happen one hour before 'nextGw''s deadline
+            await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'schedule reminder', { nextGw: nextGw });
+        } catch(error) {
+            //Log Agenda error.
+            logger.error(
+                `Error scheduling Gameweek ${nextGw} reminder. Please try again.
+                Error body : ${JSON.stringify(error.response.body)}`
+            );
+            //Throw more friendly error to client
+            throw new ServiceError(agendaErrors.SCHEDULE_ERROR);
+        }
+        
+    }
+
+    /**
+     * calls schedule for the already scheduled gameweek
+     * @param {int} nextGw The next gameweek
+     * @returns {void}
+     */
+    static async callSchedule(nextGw) {
+        //query Gameweek table to get gameweek details
+        const gameweek = await Gameweek.findByPk(nextGw);
+
+        //process the time format for the email
+        const timeFormat = this.getTimeFormat(gameweek.deadline);
+        const time = `${timeFormat.hour}:` + timeFormat.minutes + ' ' +  timeFormat.meridiem;
+
+        //calls send reminder service to send email
+        await this.sendReminder(nextGw, time);
+    }
+
+    /**
+     * call Emailservice for users that haven't made picks
+     * @param {int} nextGw The next gameweek
+     * @param {Date} Deadline  The next gameweek deadline
+     * @returns {void}
+     */
+    static async sendReminder(nextGw, deadline) {
+        const query = picksNotMadeQuery(nextGw);
+
+        const unpicked = await sequelize.query(query, { type: QueryTypes.SELECT });
+
+        unpicked.forEach(user => {
+            EmailService.sendEmail(PICKS_REMINDER, user.email, {name: user.full_name, deadline: deadline});
+        });
+
+    }
+
+    /**
+     * returns time format for gameweek
+     * @param {Date} Deadline  The next gameweek deadline
+     * @returns {object}
+     */
+    static getTimeFormat(time) {
+        let hour = time.getHours();
+        let minutes = time.getMinutes();
+        let meridiem = 'AM';
+
+        if (hour === 12) {
+            meridiem = 'PM';
+        } else if(hour > 11){
+            meridiem = 'PM';
+            hour -= 12;
+        }
+        if (minutes < 10) {
+            minutes = '0' + `${minutes}`;
+        }
+
+        return {hour: hour, minutes: minutes, meridiem: meridiem};
     }
 }
 

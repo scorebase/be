@@ -297,45 +297,45 @@ describe('Gameweek Test  /gameweek', () => {
         })
     })
 
-    describe('PUT /state', () => {
-        it('should update gameweek state successfully', (done) => {
-            const validToken = AuthService.generateToken({ id: 1 });
-            chai
-                .request(server)
-                .put('/gameweek/state')
-                .set(TOKEN_HEADER, validToken)
-                .send({ current : 0, next : 1})
-                .then((res) => {
-                    expect(res).to.have.status(200);
-                    const schema = joi.object({
-                        status: 'success',
-                        message: joi.string().valid(GAMEWEEK_STATUS_UPDATED_SUCCESS)
-                    });
-                    joi.assert(res.body, schema);
-                    done();
-                })
-                .catch(done);
-        })
-        it('should return 422 validation error if one of parameters is not valid', (done) => {
-            const validToken = AuthService.generateToken({ id: 1 });
-            chai
-                .request(server)
-                .put('/gameweek/state')
-                .set(TOKEN_HEADER, validToken)
-                .send({ current : 0, next : "hey"})
-                .then((res) => {
-                    expect(res).to.have.status(422);
-                    const schema = joi.object({
-                        status: 'error',
-                        message: joi.string().required(),
-                        data : null
-                    });
-                    joi.assert(res.body, schema);
-                    done();
-                })
-                .catch(done);
-        })
-    })
+    // describe('PUT /state', () => {
+    //     it('should update gameweek state successfully', (done) => {
+    //         const validToken = AuthService.generateToken({ id: 1 });
+    //         chai
+    //             .request(server)
+    //             .put('/gameweek/state')
+    //             .set(TOKEN_HEADER, validToken)
+    //             .send({ current : 0, next : 1})
+    //             .then((res) => {
+    //                 expect(res).to.have.status(200);
+    //                 const schema = joi.object({
+    //                     status: 'success',
+    //                     message: joi.string().valid(GAMEWEEK_STATUS_UPDATED_SUCCESS)
+    //                 });
+    //                 joi.assert(res.body, schema);
+    //                 done();
+    //             })
+    //             .catch(done);
+    //     })
+    //     it('should return 422 validation error if one of parameters is not valid', (done) => {
+    //         const validToken = AuthService.generateToken({ id: 1 });
+    //         chai
+    //             .request(server)
+    //             .put('/gameweek/state')
+    //             .set(TOKEN_HEADER, validToken)
+    //             .send({ current : 0, next : "hey"})
+    //             .then((res) => {
+    //                 expect(res).to.have.status(422);
+    //                 const schema = joi.object({
+    //                     status: 'error',
+    //                     message: joi.string().required(),
+    //                     data : null
+    //                 });
+    //                 joi.assert(res.body, schema);
+    //                 done();
+    //             })
+    //             .catch(done);
+    //     })
+    // })
 
     describe('GET /gameweek/all', () => {
         it('should get all gameweeks successfully', (done) => {

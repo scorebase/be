@@ -75,5 +75,8 @@ module.exports = {
         TEMPLATE_NOT_FOUND : 'Template not found.',
         SENDGRID_MAIL_ERROR : 'There was an issue while sending the mail. Please try again.',
         SENDER_ID_REQUIRED : 'A sender name and email is required.'
+    },
+    agendaErrors: {
+        SCHEDULE_ERROR: 'Error scheduling this job. Please try again.'
     }
 };
