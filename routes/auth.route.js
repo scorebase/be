@@ -19,11 +19,11 @@ const authRouter = express.Router();
 authRouter.post('/login', validateBody(loginUserSchema), AuthController.login);
 authRouter.post('/register', validateBody(registerUserSchema), AuthController.register);
 authRouter.put('/password', validateBody(updatePasswordSchema), isLoggedIn, AuthController.updatePassword);
-authRouter.post('/resetPasswordToken',
+authRouter.post('/resetPassword/token',
     validateBody(getResetPasswordTokenSchema),
     AuthController.createResetPasswordToken);
 
-authRouter.post('/verifyResetPasswordToken',
+authRouter.post('/resetPassword/token/verify',
     validateBody(verifyResetPasswordTokenSchema),
     AuthController.verifyResetPasswordToken);
 

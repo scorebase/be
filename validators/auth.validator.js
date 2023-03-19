@@ -32,7 +32,7 @@ const authValidator = {
 
     resetPasswordSchema : joi.object({
         token : joi.string().required(),
-        newPassword : joi.string().required()
+        newPassword : joi.string().min(7).required()
     }),
     createTokenSchema : joi.object({
         email : joi.string().email().required()
