@@ -32,6 +32,9 @@ const config = {
     },
     mail : {
         api_key : process.env.SENGRID_API_KEY
+    },
+    mongo : {
+        connection_string : process.env.MONGO_CONNECTION_STRING
     }
 };
 

@@ -21,8 +21,14 @@ module.exports.REGISTER_USER_TOKEN_LENGTH = 6;
 
 module.exports.REGISTER_USER_TOKEN_EXP_TIME = 20;
 
-module.exports.ONE_MINUTE = 60000;
+module.exports.THREE_HOURS = 60000 * 60 * 3;
 
 module.exports.LEAGUE_CODE_LENGTH = 7;
 
 module.exports.MAX_LEAGUES_PER_PLAYER = 20; //maximum number of leagues a player can participate in.
+
+module.exports.REGISTER_USER_MAIL = 'register_user';
+
+module.exports.WELCOME_USER_MAIL = 'welcome_user';
+
+module.exports.PICKS_REMINDER= 'picks_reminder';

@@ -4,6 +4,7 @@ const config = require('./config/config');
 const logger = require('./logger');
 const Sequelize = require('sequelize');
 const sequelize = require('./config/db');
+const { startAgenda }= require('./config/agenda');
 
 ///routes
 const authRouter = require('./routes/auth.route');
@@ -70,6 +71,8 @@ server.use((error, req, res, _) => {
 server.listen(config.port, async () => {
   try {
     await sequelize.authenticate();
+    //start agenda anytime server is listening/restarted
+    await startAgenda();
     logger.info('Connection has been established successfully.');
     logger.info('Server running on PORT ' + config.port);
   } catch (error) {

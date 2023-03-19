@@ -4,6 +4,7 @@ const joi = require('joi');
 
 const server = require('../..');
 const { TOKEN_HEADER } = require('../../helpers/constants');
+const { userMessages } = require('../../helpers/messages');
 const AuthService = require('../../services/auth.service');
 const users = require('../helpers/users.mock');
 
@@ -32,5 +33,35 @@ describe('USER TESTS', () => {
             })
             .catch(done)
         })
-    })
+    });
+
+    // describe('PUT /user/updateProfile', () => {
+    //     it('should update user profile with data sent by client', (done) => {
+    //         let token = AuthService.generateToken({id : 1});
+    //         let updatedProfile = {};
+    //         updatedProfile.full_name = users[3].full_name;
+    //         updatedProfile.username = users[3].username;
+
+    //         console.log(updatedProfile);
+
+    //         chai.request(server)
+    //         .put('/user/updateProfile')
+    //         .set(TOKEN_HEADER, token)
+    //         .send(updatedProfile)
+    //         .then(res => {
+    //             //console.log(res.body)
+    //             expect(res).to.have.status(200);
+    //             //console.log(res.body);
+    //             const schema = joi.object({
+    //                 status: 'success',
+    //                 message: joi.string().valid(userMessages.USER_PROFILE_UPDATE_SUCCESS),
+    //                 data : null
+    //             });
+
+    //             joi.assert(res.body, schema);
+    //             done();
+    //         })
+    //         .catch(done);
+    //     })
+    // })
 })

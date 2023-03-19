@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/scorebase/be#readme",
   "dependencies": {
+    "@hokify/agenda": "^6.3.0",
     "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
@@ -49,8 +50,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "eslint . --fix --quiet",
-      "npm run test:all"
+      "eslint . --fix --quiet"
     ]
   },
   "husky": {

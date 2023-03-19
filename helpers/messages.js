@@ -9,6 +9,9 @@ module.exports = {
         REGISTER_USER_TOKEN_CREATED_SUCCESS : 'Register user token sent successfully.',
         REGISTER_USER_TOKEN_VERIFIED_SUCCESS :'Register user token verified successfully.'
     },
+    userMessages : {
+        USER_PROFILE_UPDATE_SUCCESS: 'User profile updated successfully'
+    },
     fixtureMessages : {
         FIXTURE_CREATED_SUCCESS: 'Fixture created successfully',
         FIXTURES_FOUND_SUCCESS: 'Fixtures gotten successfully',
