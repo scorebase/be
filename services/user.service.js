@@ -32,6 +32,17 @@ class UserService {
         return user;
     }
 
+    static async updateUserProfile(id, updatedProfile){
+        const userExists = await User.findByPk(id);
+        if(!userExists) throw new NotFoundError(USER_NOT_FOUND);
+
+        const updatedData = { username: updatedProfile.username, full_name: updatedProfile.full_name };
+
+        await userExists.update(updatedData);
+
+        return null;
+    }
+
 }
 
 module.exports = UserService;
