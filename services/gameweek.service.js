@@ -193,6 +193,8 @@ class GameweekService {
      * @returns {void}
      */
     static async scheduleReminder(nextGw) {
+        if (nextGw === null) return;
+
         //query Gameweek table to get gameweek details
         const gameweek = await Gameweek.findByPk(nextGw);
 
@@ -200,8 +202,14 @@ class GameweekService {
             //create and Agenda instance and connect to the agenda server
             const agenda = new Agenda({ db: { address: config.mongo.connection_string}});
 
+            //start agenda
+            await agenda.start();
+
+            //delete any picks reminder that's in db and schedule this new one
+            await agenda.cancel({ name: 'picks reminder' });
+
             //scehdule reminder to happen one hour before 'nextGw''s deadline
-            await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'schedule reminder', { nextGw: nextGw });
+            await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'picks reminder', { nextGw: nextGw });
         } catch(error) {
             //Log Agenda error.
             logger.error(
@@ -242,9 +250,7 @@ class GameweekService {
 
         const unpicked = await sequelize.query(query, { type: QueryTypes.SELECT });
 
-        unpicked.forEach(user => {
-            EmailService.sendEmail(PICKS_REMINDER, user.email, {name: user.full_name, deadline: deadline});
-        });
+        EmailService.sendEmail(PICKS_REMINDER, unpicked, {deadline: deadline});
 
     }
 
