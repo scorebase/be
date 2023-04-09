@@ -205,8 +205,22 @@ class GameweekService {
             //start agenda
             await agenda.start();
 
-            //delete any picks reminder that's in db and schedule this new one
-            await agenda.cancel({ name: 'picks reminder' });
+            //get scheduled jobs in db
+            const jobs = await agenda.jobs({ name: 'picks reminder' });
+
+            jobs.forEach(async job => {
+                try {
+                    if (Number(job.attrs.data.nextGw) === Number(nextGw)) await job.remove();
+                } catch (error) {
+                    //Log Agenda error.
+                    logger.error(
+                        `Error deleting Gameweek ${nextGw} reminder. Please try again.
+                        Error body : ${JSON.stringify(error.response.body)}`
+                    );
+                    //Throw more friendly error to client
+                    throw new ServiceError(agendaErrors.REMOVAL_ERROR);
+                }
+            });
 
             //scehdule reminder to happen one hour before 'nextGw''s deadline
             await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'picks reminder', { nextGw: nextGw });
