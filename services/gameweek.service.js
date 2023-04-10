@@ -193,6 +193,8 @@ class GameweekService {
      * @returns {void}
      */
     static async scheduleReminder(nextGw) {
+        if (nextGw === null) return;
+
         //query Gameweek table to get gameweek details
         const gameweek = await Gameweek.findByPk(nextGw);
 
@@ -200,8 +202,28 @@ class GameweekService {
             //create and Agenda instance and connect to the agenda server
             const agenda = new Agenda({ db: { address: config.mongo.connection_string}});
 
+            //start agenda
+            await agenda.start();
+
+            //get scheduled jobs in db
+            const jobs = await agenda.jobs({ name: 'picks reminder' });
+
+            jobs.forEach(async job => {
+                try {
+                    if (Number(job.attrs.data.nextGw) === Number(nextGw)) await job.remove();
+                } catch (error) {
+                    //Log Agenda error.
+                    logger.error(
+                        `Error deleting Gameweek ${nextGw} reminder. Please try again.
+                        Error body : ${JSON.stringify(error.response.body)}`
+                    );
+                    //Throw more friendly error to client
+                    throw new ServiceError(agendaErrors.REMOVAL_ERROR);
+                }
+            });
+
             //scehdule reminder to happen one hour before 'nextGw''s deadline
-            await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'schedule reminder', { nextGw: nextGw });
+            await agenda.schedule(gameweek.deadline - (THREE_HOURS), 'picks reminder', { nextGw: nextGw });
         } catch(error) {
             //Log Agenda error.
             logger.error(
@@ -242,9 +264,7 @@ class GameweekService {
 
         const unpicked = await sequelize.query(query, { type: QueryTypes.SELECT });
 
-        unpicked.forEach(user => {
-            EmailService.sendEmail(PICKS_REMINDER, user.email, {name: user.full_name, deadline: deadline});
-        });
+        EmailService.sendEmail(PICKS_REMINDER, unpicked, {deadline: deadline});
 
     }
 

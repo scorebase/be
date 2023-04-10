@@ -1,6 +1,6 @@
 module.exports.picksNotMadeQuery = (nextGw) => {
     return `
-        SELECT email, full_name
+        SELECT email
         FROM users
         LEFT JOIN picks
             ON picks.player_id = users.id

@@ -44,6 +44,7 @@ const gameweekController = {
             const { deadline, title } = req.body;
             const data = await GameweekService.updateGameweek(gameweekId, deadline, title);
             gwCache.removeMultiple(['all', gameweekId, 'state']);
+            await GameweekService.scheduleReminder(gameweekId);
             return successResponse(res, GAMEWEEK_UPDATED_SUCCESS, data);
         } catch (error) {
             next(error);

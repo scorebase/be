@@ -9,7 +9,7 @@ module.exports.startAgenda = async() => {
         const agenda = new Agenda({ db: { address: config.mongo.connection_string}});
 
         //define agenda
-        agenda.define('schedule reminder', async job => {
+        agenda.define('picks reminder', async job => {
             //send reminder
             await GameweekService.callSchedule(job.attrs.data.nextGw);
     

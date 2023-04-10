@@ -77,6 +77,7 @@ module.exports = {
         SENDER_ID_REQUIRED : 'A sender name and email is required.'
     },
     agendaErrors: {
-        SCHEDULE_ERROR: 'Error scheduling this job. Please try again.'
+        SCHEDULE_ERROR: 'Error scheduling this job. Please try again.',
+        REMOVAL_ERROR: 'Error deleting this job. Please try again.'
     }
 };
